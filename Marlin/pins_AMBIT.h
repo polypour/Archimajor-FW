@@ -82,7 +82,7 @@
 #define MOTOR_CURRENT_PWM_E1_PIN  11 //PD7  REF4 TIOA8
 
 #define MOTOR_CURRENT_PWM_RANGE 2750 // 3.3 volts * (100 kOhm / (100 kOhm + 20 kOhm) ) = 2.75 max voltage out
-#define DEFAULT_PWM_MOTOR_CURRENT  {1000, 1000, 1000, 1000, 1000} //X Y Z E0 E1, 1000 = 1000mAh
+#define DEFAULT_PWM_MOTOR_CURRENT  {1372, 1372, 1058, 1800, 1372} //X Y Z E0 E1, 1000 = 1000mAh
 
 #define SDPOWER            -1
 
