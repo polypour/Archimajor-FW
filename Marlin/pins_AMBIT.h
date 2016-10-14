@@ -45,6 +45,10 @@
 #define E1_DIR_PIN         27 //PD2 DIR4
 #define E1_ENABLE_PIN      28 //PD3 EN4
 
+#define E2_STEP_PIN        99 //PB6 GPIO EXP
+#define E2_DIR_PIN         100 //PB8 GPIO EXP
+#define E2_ENABLE_PIN      101 //PB5 GPIO EXP
+
 #define X_MS1_PIN          39 //PC7 MOD0E1 //As listed in schematic
 #define X_MS2_PIN          38 //PC6 MOD1E1
 #define X_MS3_PIN          37 //PC5 MOD2E1
@@ -107,9 +111,9 @@
 
 
 #define TEMP_0_PIN         10 // D10 PB19 THERM AN1
-#define TEMP_2_PIN          9 // D9 PB18 THERM AN2
+#define TEMP_1_PIN          9 // D9 PB18 THERM AN2
 #define TEMP_BED_PIN       11 // D11 PB20 THERM AN3
-#define TEMP_1_PIN          8 // D8 PB17 THERM AN4
+#define TEMP_2_PIN          8 // D8 PB17 THERM AN4
 
 #ifdef Z_PROBE_SLED
   #define SLED_PIN         -1
