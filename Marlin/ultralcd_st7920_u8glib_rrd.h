@@ -21,17 +21,19 @@
 
 #include <U8glib.h>
 
+#define RRD_TIMING_BIT_DELAY 2
+
 static void ST7920_SWSPI_SND_8BIT(uint8_t val)
 {
   uint8_t i;
   for( i=0; i<8; i++ )
   {
     WRITE(ST7920_CLK_PIN,0);
-    delayMicroseconds(2);
+    delayMicroseconds(RRD_TIMING_BIT_DELAY);
     WRITE(ST7920_DAT_PIN,val&0x80); 
     val<<=1;
     WRITE(ST7920_CLK_PIN,1);
-    delayMicroseconds(2);
+    delayMicroseconds(RRD_TIMING_BIT_DELAY);
   }
 }
 
