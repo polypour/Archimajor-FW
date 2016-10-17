@@ -847,21 +847,27 @@ void tp_init() {
 
   #if HAS_HEATER_0
     SET_OUTPUT(HEATER_0_PIN);
+    WRITE_HEATER(HEATER_0_PIN,LOW);
   #endif
   #if HAS_HEATER_1
     SET_OUTPUT(HEATER_1_PIN);
+    WRITE_HEATER(HEATER_1_PIN,LOW);
   #endif
   #if HAS_HEATER_2
     SET_OUTPUT(HEATER_2_PIN);
+    WRITE_HEATER(HEATER_2_PIN,LOW);
   #endif
   #if HAS_HEATER_3
     SET_OUTPUT(HEATER_3_PIN);
+    WRITE_HEATER(HEATER_3_PIN,LOW);
   #endif
   #if HAS_HEATER_BED
     SET_OUTPUT(HEATER_BED_PIN);
+    WRITE_HEATER_BED(LOW);
   #endif  
   #if HAS_FAN
     SET_OUTPUT(FAN_PIN);
+    WRITE_FAN(LOW);
     #ifdef FAST_PWM_FAN
       setPwmFrequency(FAN_PIN, 1); // No prescaling. Pwm frequency = F_CPU/256/8
     #endif
