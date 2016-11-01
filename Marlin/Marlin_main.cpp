@@ -6690,7 +6690,9 @@ void kill(const char *lcd_msg) {
   for (int i = 5; i--; lcd_update()) delay(200); // Wait a short time
   cli();   // disable interrupts
   suicide();
-  while(1) { /* Intentionally left empty */ } // Wait for reset
+  while(1) { /* Intentionally left empty */
+    watchdogReset();
+  } // Wait for reset
 }
 
 #ifdef FILAMENT_RUNOUT_SENSOR
