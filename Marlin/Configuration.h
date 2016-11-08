@@ -82,7 +82,7 @@ Here are some standard links for getting your machine calibrated:
 
 // This defines the number of extruders
 // :[1,2,3,4]
-#define EXTRUDERS 3
+#define EXTRUDERS 1
 
 // Offset of the extruders (uncomment if using more than one and relying on firmware to position when changing).
 // The offset has to be X=0, Y=0 for the extruder 0 hotend (default extruder).
@@ -162,11 +162,11 @@ Here are some standard links for getting your machine calibrated:
 // The minimal temperature defines the temperature below which the heater will not be enabled It is used
 // to check that the wiring to the thermistor is not broken.
 // Otherwise this would lead to the heater being powered on all the time.
-#define HEATER_0_MINTEMP 0
-#define HEATER_1_MINTEMP 0
-#define HEATER_2_MINTEMP 0
-#define HEATER_3_MINTEMP 0
-#define BED_MINTEMP 0
+#define HEATER_0_MINTEMP 5
+#define HEATER_1_MINTEMP 5
+#define HEATER_2_MINTEMP 5
+#define HEATER_3_MINTEMP 5
+#define BED_MINTEMP 5
 
 // When temperature exceeds max temp, your heater will be switched off.
 // This feature exists to protect your hotend from overheating accidentally, but *NOT* from thermistor short/failure!
@@ -206,11 +206,15 @@ Here are some standard links for getting your machine calibrated:
   #define PID_INTEGRAL_DRIVE_MAX PID_MAX  //limit for the integral term
   #define K1 0.95 //smoothing factor within the PID
 
+#define  DEFAULT_Kp 39.64
+#define  DEFAULT_Ki 2.74
+#define  DEFAULT_Kd 143.37
+
   // If you are using a pre-configured hotend then you can use one of the value sets by uncommenting it
   // Ultimaker
-  #define  DEFAULT_Kp 22.2
-  #define  DEFAULT_Ki 1.08
-  #define  DEFAULT_Kd 114
+  //#define  DEFAULT_Kp 22.2
+  //#define  DEFAULT_Ki 1.08
+  //#define  DEFAULT_Kd 114
 
   // MakerGear
   //#define  DEFAULT_Kp 7.0
@@ -330,9 +334,9 @@ Here are some standard links for getting your machine calibrated:
 #endif
 
 // Mechanical endstop with COM to ground and NC to Signal uses "false" here (most common setup).
-const bool X_MIN_ENDSTOP_INVERTING = true; // set to true to invert the logic of the endstop.
-const bool Y_MIN_ENDSTOP_INVERTING = true; // set to true to invert the logic of the endstop.
-const bool Z_MIN_ENDSTOP_INVERTING = true; // set to true to invert the logic of the endstop.
+const bool X_MIN_ENDSTOP_INVERTING = false; // set to true to invert the logic of the endstop.
+const bool Y_MIN_ENDSTOP_INVERTING = false; // set to true to invert the logic of the endstop.
+const bool Z_MIN_ENDSTOP_INVERTING = false; // set to true to invert the logic of the endstop.
 const bool X_MAX_ENDSTOP_INVERTING = true; // set to true to invert the logic of the endstop.
 const bool Y_MAX_ENDSTOP_INVERTING = true; // set to true to invert the logic of the endstop.
 const bool Z_MAX_ENDSTOP_INVERTING = true; // set to true to invert the logic of the endstop.
@@ -623,11 +627,11 @@ const bool Z_PROBE_ENDSTOP_INVERTING = false; // set to true to invert the logic
 // Preheat Constants
 #define PLA_PREHEAT_HOTEND_TEMP 180
 #define PLA_PREHEAT_HPB_TEMP 70
-#define PLA_PREHEAT_FAN_SPEED 0   // Insert Value between 0 and 255
+#define PLA_PREHEAT_FAN_SPEED 50   // Insert Value between 0 and 255
 
 #define ABS_PREHEAT_HOTEND_TEMP 240
 #define ABS_PREHEAT_HPB_TEMP 110
-#define ABS_PREHEAT_FAN_SPEED 0   // Insert Value between 0 and 255
+#define ABS_PREHEAT_FAN_SPEED 50   // Insert Value between 0 and 255
 
 //==============================LCD and SD support=============================
 // @section lcd
@@ -646,8 +650,8 @@ const bool Z_PROBE_ENDSTOP_INVERTING = false; // set to true to invert the logic
 
 //#define ULTRA_LCD  //general LCD support, also 16x2
 //#define DOGLCD  // Support for SPI LCD 128x64 (Controller ST7565R graphic Display Family)
-#define SDSUPPORT // Enable SD Card Support in Hardware Console
-#define SDHSMCI_SUPPORT
+//#define SDSUPPORT // Enable SD Card Support in Hardware Console
+//#define SDHSMCI_SUPPORT
 //#define SDSLOW // Use slower SD transfer mode (not normally needed - uncomment if you're getting volume init error)
 //#define SD_CHECK_AND_RETRY // Use CRC checks and retries on the SD communication
 #define ENCODER_PULSES_PER_STEP 2 // Increase if you have a high resolution encoder
@@ -689,7 +693,7 @@ const bool Z_PROBE_ENDSTOP_INVERTING = false; // set to true to invert the logic
 
 // The RepRapDiscount Smart Controller (white PCB)
 // http://reprap.org/wiki/RepRapDiscount_Smart_Controller
-#define REPRAP_DISCOUNT_SMART_CONTROLLER
+//#define REPRAP_DISCOUNT_SMART_CONTROLLER
 
 // The GADGETS3D G3D LCD/SD Controller (blue PCB)
 // http://reprap.org/wiki/RAMPS_1.3/1.4_GADGETS3D_Shield_with_Panel

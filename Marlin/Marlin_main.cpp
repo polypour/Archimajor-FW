@@ -706,6 +706,9 @@ void setup() {
     pinMode(STAT_LED_BLUE, OUTPUT);
     digitalWrite(STAT_LED_BLUE, LOW); // turn it off
   #endif  
+
+  #define LEDT_PIN 33
+  pinMode(LEDT_PIN,OUTPUT);
 }
 
 /**
@@ -720,6 +723,9 @@ void setup() {
  */
 void loop() {
   if (commands_in_queue < BUFSIZE - 1) get_command();
+
+  //digitalWrite(LEDR_PIN,!digitalRead(LEDR_PIN));
+  TOGGLE(LEDT_PIN);
 
   #ifdef SDSUPPORT
     card.checkautostart(false);
@@ -5646,7 +5652,21 @@ void process_next_command() {
           spiflash_write_byte(2,37);
           SerialUSB.print("ReadByte: "); SerialUSB.println(spiflash_read_byte(2));
           break;
-      
+
+        case 289: // M289 BLOCKING DELAY FOR HANG TEST
+          if(code_seen('S')) delay(1000 * code_value());
+          break;
+        case 290: //M290
+          kill(PSTR("TESTING KILL MSG"));
+        case 291: //M291
+          _temp_error(-1, PSTR(MSG_T_MINTEMP), PSTR(MSG_ERR_MINTEMP));
+        case 292: //M292
+          min_temp_error(0);
+        case 293: //M293
+          #ifdef ULTRA_LCD
+          lcd_setalertstatuspgm(PSTR("TEST MESSAGE 123"));
+          #endif
+          break;
       #if HAS_BUZZER
         case 300: // M300 - Play beep tone
           gcode_M300();
@@ -6674,7 +6694,7 @@ void kill(const char *lcd_msg) {
     lcd_setalertstatuspgm(lcd_msg);
   #endif
 
-  cli(); // Stop interrupts
+  //cli(); // Stop interrupts
   disable_all_heaters();
   disable_all_steppers();
 
@@ -6688,10 +6708,23 @@ void kill(const char *lcd_msg) {
   // FMC small patch to update the LCD before ending
   sei();   // enable interrupts
   for (int i = 5; i--; lcd_update()) delay(200); // Wait a short time
-  cli();   // disable interrupts
+  //cli();   // disable interrupts
   suicide();
+
   while(1) { /* Intentionally left empty */
+    static unsigned long loopcount = 0;
+    if (serialEventRun) serialEventRun();
     watchdogReset();
+    //if(MYSERIAL.available())
+    {
+      //MYSERIAL.flush();
+      SERIAL_PROTOCOLLNPGM("start");
+      SERIAL_ERROR_START;
+      SERIAL_ERRORLNPGM(MSG_ERR_KILLED);
+    }
+    delay(1000);
+    loopcount++;
+    MYSERIAL.println(loopcount);
   } // Wait for reset
 }
 

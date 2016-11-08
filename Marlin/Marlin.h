@@ -204,6 +204,12 @@ void prepare_move();
 void kill(const char *);
 void Stop();
 
+inline void _temp_error(int e, const char *serial_msg, const char *lcd_msg); /*temperature.cpp*/
+void min_temp_error(uint8_t); /*temperature.cpp*/
+#ifndef ULTRALCD_H
+void lcd_setalertstatuspgm(const char* message); /*ultralcd.h*/
+#endif
+
 #ifdef FILAMENT_RUNOUT_SENSOR
   void filrunout();
 #endif

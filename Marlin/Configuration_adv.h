@@ -27,13 +27,13 @@
    * degrees, the machine is halted, requiring a hard reset. This test restarts with any M104/M109,
    * but only if the current temperature is far enough below the target for a reliable test.
    */
-  #define WATCH_TEMP_PERIOD 16                // Seconds
+  #define WATCH_TEMP_PERIOD 20                // Seconds
   #define WATCH_TEMP_INCREASE 4               // Degrees Celsius
 #endif
 
 #ifdef THERMAL_PROTECTION_BED
-  #define THERMAL_PROTECTION_BED_PERIOD 20    // Seconds
-  #define THERMAL_PROTECTION_BED_HYSTERESIS 2 // Degrees Celsius
+  #define THERMAL_PROTECTION_BED_PERIOD 60    // Seconds
+  #define THERMAL_PROTECTION_BED_HYSTERESIS 5 // Degrees Celsius
 #endif
 
 #ifdef PIDTEMP
@@ -106,12 +106,12 @@
 // extruder temperature is above/below EXTRUDER_AUTO_FAN_TEMPERATURE.
 // Multiple extruders can be assigned to the same pin in which case
 // the fan will turn on when any selected extruder is above the threshold.
-#define EXTRUDER_0_AUTO_FAN_PIN -1
+#define EXTRUDER_0_AUTO_FAN_PIN  FAN2_PIN
 #define EXTRUDER_1_AUTO_FAN_PIN -1
 #define EXTRUDER_2_AUTO_FAN_PIN -1
 #define EXTRUDER_3_AUTO_FAN_PIN -1
 #define EXTRUDER_AUTO_FAN_TEMPERATURE 50
-#define EXTRUDER_AUTO_FAN_SPEED   255  // == full speed
+#define EXTRUDER_AUTO_FAN_SPEED   120  // == full speed
 
 
 //===========================================================================
