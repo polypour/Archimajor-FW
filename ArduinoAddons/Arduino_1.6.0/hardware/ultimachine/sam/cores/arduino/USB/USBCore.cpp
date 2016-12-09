@@ -203,6 +203,13 @@ uint32_t USBD_Send(uint32_t ep, const void* d, uint32_t len)
 			n = len;
 		len -= n;
 
+		int count=0;
+		while( UOTGHS_DEVEPTISR_TXINI != (UOTGHS->UOTGHS_DEVEPTISR[ep & 0xF] & UOTGHS_DEVEPTISR_TXINI ))
+		{
+			count++;
+			if (count>10000) return len;
+		}
+
 		UDD_Send(ep & 0xF, data, n);
 		data += n;
     }
