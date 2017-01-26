@@ -5420,6 +5420,62 @@ void process_next_command() {
           break;
       #endif // ENABLE_AUTO_BED_LEVELING && Z_PROBE_REPEATABILITY_TEST
 
+        case 60: //M60 Peripheral Clock Debugging
+        {
+          #define PRINT_PERIPH(id) { SerialUSB.print("ID: "); SerialUSB.print(id); SerialUSB.print("  State: "); SerialUSB.println( pmc_is_periph_clk_enabled(id) ); }
+
+          // Show status of all peripheral clocks
+          if( code_seen('H') ) pmc_enable_all_periph_clk();
+
+          // I<id> Show status of a specific peripheral clock
+          if ( code_seen('I') ) {
+            uint8_t periphID = code_value();
+            PRINT_PERIPH(periphID);
+            break;
+          }
+
+          // Print all peripheral clocks
+          for(uint8_t i = 0; i < ID_PERIPH_COUNT; i++) {
+            PRINT_PERIPH(i);
+          }
+
+          // P<id> Enable a specific peripheral clock
+          if( code_seen('P') )  {
+            uint8_t periphID = code_value();
+            pmc_enable_periph_clk( code_value() );
+            PRINT_PERIPH(periphID);
+          }
+
+          // D<id> Disable a specific peripheral clock
+          if( code_seen('D') )  {
+            uint8_t periphID = code_value();
+            pmc_disable_periph_clk( code_value() );
+            PRINT_PERIPH(periphID);
+          }
+
+          // L Disable all peripheral clocks
+          if( code_seen('L') )
+            pmc_disable_all_periph_clk();
+        }
+        break;
+        case '61': //M61
+        {
+          SerialUSB.print("PMC->PMC_PCSR0: ");
+          SerialUSB.print(PMC->PMC_PCSR0,BIN);
+
+          SerialUSB.print("  PMC->PMC_PCSR1: ");
+          SerialUSB.println(PMC->PMC_PCSR1,BIN);
+        }
+        case '62': //M62
+        {
+          SerialUSB.print("PMC->PMC_PCSR0: ");
+          SerialUSB.print(PMC->PMC_PCSR0);
+
+          SerialUSB.print("  PMC->PMC_PCSR1: ");
+          SerialUSB.println(PMC->PMC_PCSR1);
+        }
+        break;
+
       #ifdef M100_FREE_MEMORY_WATCHER
         case 100:
           gcode_M100();
