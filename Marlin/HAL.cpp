@@ -33,9 +33,8 @@
 
 #ifdef EEPROM_SETTINGS
 #include <Wire.h>
-#endif
-
 #include <SPI.h>
+#endif
 
 // --------------------------------------------------------------------------
 // Externals
@@ -103,7 +102,7 @@ int freeMemory() {
 
   return free_memory;
 }
-
+#ifdef SPIFLASH_SETTINGS
 // --------------------------------------------------------------------------
 // spiflash
 // --------------------------------------------------------------------------
@@ -169,7 +168,13 @@ void spiflash_write_byte(long address, uint8_t value)
   SPI.transfer(SPIFLASH_CS, address, SPI_CONTINUE);
   SPI.transfer(SPIFLASH_CS, value); // Value to Write
 }
-
+#else
+void spiflash_write_byte(long address, uint8_t value) {}
+void spiflash_erase(long address) {}
+uint8_t spiflash_read_byte(long address) {}
+uint8_t spiflash_busy() {}
+void spiflash_init() {}
+#endif
 
 // --------------------------------------------------------------------------
 // eeprom
