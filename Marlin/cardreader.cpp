@@ -623,6 +623,8 @@ void CardReader::checkautostart(bool force) {
     if (!cardOK) return; // fail
   }
   #ifdef SDHSMCI_SUPPORT
+    enqueuecommand(PSTR("M23 autoMG.g"));
+    enqueuecommands_P(PSTR("M24"));
     return;
   #endif
 
