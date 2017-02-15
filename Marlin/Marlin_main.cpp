@@ -1253,8 +1253,11 @@ static void setup_for_endstop_move() {
       plan_set_position(current_position[X_AXIS], current_position[Y_AXIS], zPosition, current_position[E_AXIS]);
 
       // move up the retract distance
-      zPosition += home_bump_mm(Z_AXIS);
-      line_to_z(zPosition);
+      endstops_hit_on_purpose(); // clear endstop hit flags
+      //zPosition += home_bump_mm(Z_AXIS);
+      current_position[Z_AXIS] = st_get_position_mm(Z_AXIS) + 5;
+      //line_to_z(zPosition);
+      line_to_current_position();
       st_synchronize();
       endstops_hit_on_purpose(); // clear endstop hit flags
 
@@ -1512,7 +1515,9 @@ static void setup_for_endstop_move() {
   static float probe_pt(float x, float y, float z_before, ProbeAction probe_action=ProbeDeployAndStow, int verbose_level=1) {
     // Move Z up to the z_before height, then move the probe to the given XY
     do_blocking_move_to_z(z_before); // this also updates current_position
+    //do_blocking_move_to_z(current_position[Z_AXIS] + Z_RAISE_BETWEEN_PROBINGS);
     do_blocking_move_to_xy(x - X_PROBE_OFFSET_FROM_EXTRUDER, y - Y_PROBE_OFFSET_FROM_EXTRUDER); // this also updates current_position
+    //do_blocking_move_to(x - X_PROBE_OFFSET_FROM_EXTRUDER, y - Y_PROBE_OFFSET_FROM_EXTRUDER,z_before); // this also updates current_position
 
     #if !defined(Z_PROBE_SLED) && !defined(Z_PROBE_ALLEN_KEY)
       if (probe_action & ProbeDeploy) deploy_z_probe();
@@ -2200,6 +2205,14 @@ inline void gcode_G28() {
 
                 // Home the Z axis
                 HOMEAXIS(Z);
+
+                //Z_RAISE_AFTER_HOMING - NOT WORKING RIGHT
+                /*
+                destination[Z_AXIS] = Z_RAISE_AFTER_HOMING * home_dir(Z_AXIS) * (-1);    // Set destination away from bed
+                feedrate = max_feedrate[Z_AXIS] * 60;  // feedrate (mm/m) = max_feedrate (mm/s)
+                line_to_destination();
+                st_synchronize();
+                */
               }
               else {
                 LCD_MESSAGEPGM(MSG_ZPROBE_OUT);
@@ -2601,8 +2614,13 @@ inline void gcode_G28() {
           double xProbe = left_probe_bed_position + xGridSpacing * xCount;
 
           // raise extruder
-          float measured_z,
-                z_before = probePointCounter ? Z_RAISE_BETWEEN_PROBINGS + current_position[Z_AXIS] : Z_RAISE_BEFORE_PROBING;
+          float measured_z, z_before;
+          //      z_before = probePointCounter ? Z_RAISE_BETWEEN_PROBINGS + current_position[Z_AXIS] : Z_RAISE_BEFORE_PROBING;
+          z_before = Z_RAISE_BETWEEN_PROBINGS + current_position[Z_AXIS];
+          SerialUSB.print("current_position[Z_AXIS]: ");
+          SerialUSB.println(current_position[Z_AXIS]);
+          SerialUSB.print("z_before: ");
+          SerialUSB.println(z_before);
 
           #ifdef DELTA
             // Avoid probing the corners (outside the round or hexagon print surface) on a delta printer.
@@ -2620,6 +2638,7 @@ inline void gcode_G28() {
           else
             act = ProbeStay;
 
+          //do_blocking_move_to_z(current_position[Z_AXIS] + Z_RAISE_BETWEEN_PROBINGS);
           measured_z = probe_pt(xProbe, yProbe, z_before, act, verbose_level);
 
           #ifndef DELTA

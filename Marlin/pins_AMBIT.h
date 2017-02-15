@@ -28,7 +28,7 @@
 #define Y_STEP_PIN         49 //PC14 STEP2
 #define Y_DIR_PIN          47 //PC16 DIR2
 #define Y_ENABLE_PIN       48 //PC15 EN2
-#define Y_MIN_PIN          29 //PD6 MIN ES2
+#define Y_MIN_PIN          -1 //29 //PD6 MIN ES2
 #define Y_MAX_PIN          15 //PD5 MAX ES2
 
 #define Z_STEP_PIN         36 //PC4 STEP Z
@@ -86,7 +86,7 @@
 #define MOTOR_CURRENT_PWM_E1_PIN  11 //PD7  REF4 TIOA8
 
 #define MOTOR_CURRENT_PWM_RANGE 2750 // 3.3 volts * (100 kOhm / (100 kOhm + 20 kOhm) ) = 2.75 max voltage out
-#define DEFAULT_PWM_MOTOR_CURRENT  {1000, 1000, 1000, 1000, 1000} //X Y Z E0 E1, 1000 = 1000mAh
+#define DEFAULT_PWM_MOTOR_CURRENT  {1373, 1373, 1568, 1059, 1059} //X Y Z E0 E1, 1000 = 1000mAh
 
 #define SDPOWER            -1
 
@@ -95,7 +95,7 @@
 
 #define LED_PIN            -1
 #define PS_ON_PIN          -1
-//#define Z_PROBE_PIN        -1
+#define Z_PROBE_PIN        29 //Reusing Ymin on Archim for Taz6 since it homes in Ymax
 #define CONTROLLERFAN_PIN -1
 
 #define AMBIT_1
@@ -123,10 +123,14 @@
   #define KILL_PIN           -1 //Button is connected directly to NRST Hardware Reset Pin on SAM3X
   #ifdef NEWPANEL
    //arduino pin which triggers an piezzo beeper
-    #define BEEPER          23 //D24 PA15_CTS1
-    #define LCD_PINS_RS     17 //D17 PA12_RXD1
-    #define LCD_PINS_ENABLE 24 //D23 PA14_RTS1
-    #define LCD_PINS_D4     69 //D69 PA0_CANTX0
+    #define BEEPER          23 
+    //D24 PA15_CTS1
+    #define LCD_PINS_RS     17 
+    //D17 PA12_RXD1
+    #define LCD_PINS_ENABLE 24 
+    //D23 PA14_RTS1
+    #define LCD_PINS_D4     69
+    //D69 PA0_CANTX0
     #define LCD_PINS_D5     54 //D54 PA16_SCK1
     #define LCD_PINS_D6     68 //D68 PA1_CANRX0
     #define LCD_PINS_D7     34 //D34 PC2_PWML0
