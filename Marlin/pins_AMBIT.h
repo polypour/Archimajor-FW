@@ -86,7 +86,7 @@
 #define MOTOR_CURRENT_PWM_E1_PIN  11 //PD7  REF4 TIOA8
 
 #define MOTOR_CURRENT_PWM_RANGE 2750 // 3.3 volts * (100 kOhm / (100 kOhm + 20 kOhm) ) = 2.75 max voltage out
-#define DEFAULT_PWM_MOTOR_CURRENT  {1000, 1000, 1000, 1000, 1000} //X Y Z E0 E1, 1000 = 1000mAh
+#define DEFAULT_PWM_MOTOR_CURRENT  {1098, 1098, 1098, 1020, 1000} //X Y Z E0 E1, 1000 = 1000mAh
 
 #define SDPOWER            -1
 
@@ -124,12 +124,18 @@
   #ifdef NEWPANEL
    //arduino pin which triggers an piezzo beeper
     #define BEEPER          23 //D24 PA15_CTS1
-    #define LCD_PINS_RS     17 //D17 PA12_RXD1
-    #define LCD_PINS_ENABLE 24 //D23 PA14_RTS1
-    #define LCD_PINS_D4     69 //D69 PA0_CANTX0
-    #define LCD_PINS_D5     54 //D54 PA16_SCK1
-    #define LCD_PINS_D6     68 //D68 PA1_CANRX0
-    #define LCD_PINS_D7     34 //D34 PC2_PWML0
+    #define LCD_PINS_RS     17 
+    //D17 PA12_RXD1
+    #define LCD_PINS_ENABLE 24 
+    //D23 PA14_RTS1
+    #define LCD_PINS_D4     69 
+    //D69 PA0_CANTX0
+    #define LCD_PINS_D5     54 
+    //D54 PA16_SCK1
+    #define LCD_PINS_D6     68 
+    //D68 PA1_CANRX0
+    #define LCD_PINS_D7     34 
+    //D34 PC2_PWML0
     
     #define SDCARDDETECT     2 //D2  PB25_TIOA0
     #define SDSS            87 //D87 PA29 CS
