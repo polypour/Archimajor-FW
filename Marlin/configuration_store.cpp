@@ -299,6 +299,12 @@ void Config_StoreSettings()  {
   int j = EEPROM_OFFSET;
   EEPROM_WRITE_VAR(j, ver2); // validate data
 
+
+  //Quick fix for archim. The default SPI CS pin conflicts with E0_STEP_PIN.
+  #if MOTHERBOARD == BOARD_AMBIT
+    pinMode(E0_STEP_PIN,OUTPUT);
+  #endif
+
   // Report storage size
   SERIAL_ECHO_START;
   SERIAL_ECHOPAIR("Settings Stored (", (unsigned long)i);
@@ -476,6 +482,11 @@ void Config_RetrieveSettings() {
 
   #ifdef EEPROM_CHITCHAT
     Config_PrintSettings();
+  #endif
+
+  //Quick fix for archim. The default SPI CS pin conflicts with E0_STEP_PIN.
+  #if MOTHERBOARD == BOARD_AMBIT
+    pinMode(E0_STEP_PIN,OUTPUT);
   #endif
 }
 

@@ -107,7 +107,7 @@ int freeMemory() {
 // --------------------------------------------------------------------------
 // spiflash
 // --------------------------------------------------------------------------
-#define SPIFLASH_CS 77  // Chip Select PIN
+#define SPIFLASH_CS 86 //D86 PB21 CS2 //77 //CS0  // Chip Select PIN
 #define SPIFLASH_WRITE_ENABLE  0x06  //Write Enable (06h)
 #define SPIFLASH_READ_STATUS   0x05  //Read Status Register (05h)
 #define SPIFLASH_WRITE_IN_PROGRESS_MASK 0b00000001
@@ -118,7 +118,10 @@ int freeMemory() {
 
 void spiflash_init()
 {
+  pinMode(SPIFLASH_CS,OUTPUT);
+  digitalWrite(SPIFLASH_CS,HIGH);
   SPI.begin(SPIFLASH_CS);
+  digitalWrite(SPIFLASH_CS,LOW);
   // MFG ID
   SPI.transfer(SPIFLASH_CS, SPIFLASH_READ_ID, SPI_CONTINUE);
   SPI.transfer(SPIFLASH_CS, 0x00, SPI_CONTINUE);
@@ -128,6 +131,12 @@ void spiflash_init()
   SerialUSB.print( SPI.transfer(SPIFLASH_CS, 0x00, SPI_CONTINUE) );
   SerialUSB.print(" "); 
   SerialUSB.println( SPI.transfer(SPIFLASH_CS, 0x00) );
+  digitalWrite(SPIFLASH_CS,HIGH);
+
+  //Quick fix for archim. The default SPI CS pin conflicts with E0_STEP_PIN.
+  #if MOTHERBOARD == BOARD_AMBIT
+    pinMode(E0_STEP_PIN,OUTPUT);
+  #endif
 }
 
 uint8_t spiflash_busy()
