@@ -33,9 +33,8 @@
 
 #ifdef EEPROM_SETTINGS
 #include <Wire.h>
-#endif
-
 #include <SPI.h>
+#endif
 
 // --------------------------------------------------------------------------
 // Externals
@@ -107,6 +106,7 @@ int freeMemory() {
 // --------------------------------------------------------------------------
 // spiflash
 // --------------------------------------------------------------------------
+#ifdef EEPROM_SETTINGS
 #define SPIFLASH_CS 86 //D86 PB21 CS2 //77 //CS0  // Chip Select PIN
 #define SPIFLASH_WRITE_ENABLE  0x06  //Write Enable (06h)
 #define SPIFLASH_READ_STATUS   0x05  //Read Status Register (05h)
@@ -178,7 +178,7 @@ void spiflash_write_byte(long address, uint8_t value)
   SPI.transfer(SPIFLASH_CS, address, SPI_CONTINUE);
   SPI.transfer(SPIFLASH_CS, value); // Value to Write
 }
-
+#endif
 
 // --------------------------------------------------------------------------
 // eeprom
@@ -238,7 +238,11 @@ typedef struct {
   IRQn_Type   IRQ_Id;
 } tTimerConfig;
 
+#ifdef TC2
 #define  NUM_HARDWARE_TIMERS 9
+#else
+#define  NUM_HARDWARE_TIMERS 6
+#endif
 
 static const tTimerConfig TimerConfig [NUM_HARDWARE_TIMERS] =
 {
@@ -248,9 +252,11 @@ static const tTimerConfig TimerConfig [NUM_HARDWARE_TIMERS] =
   { TC1, 0, TC3_IRQn},
   { TC1, 1, TC4_IRQn},
   { TC1, 2, TC5_IRQn},
+#ifdef TC2
   { TC2, 0, TC6_IRQn},
   { TC2, 1, TC7_IRQn},
   { TC2, 2, TC8_IRQn},
+#endif
 };
 
 /*
@@ -382,14 +388,22 @@ HAL_BEEPER_TIMER_ISR {
 }
 
 // --------------------------------------------------------------------------
-//
+// ADC
 // --------------------------------------------------------------------------
-
+static inline uint32_t mapRes(uint32_t value, uint32_t from, uint32_t to) {
+  if (from == to)
+    return value;
+  if (from > to)
+    return value >> (from-to);
+  else
+    return value << (to-from);
+}
 uint16_t getAdcReading(adc_channel_num_t chan)
 {
 	if ((ADC->ADC_ISR & BIT(chan)) == BIT(chan)) {
 		uint16_t rslt = ADC->ADC_CDR[chan];
 		ADC->ADC_CHDR |= BIT(chan);
+    //rslt = mapRes(rslt, 12, 10);
 		return rslt;
 	}
 	else {
@@ -418,6 +432,7 @@ uint16_t getAdcFreerun(adc_channel_num_t chan, bool wait_for_conversion)
   if (wait_for_conversion) while (!((ADC->ADC_ISR & BIT(chan)) == BIT(chan)));
   if ((ADC->ADC_ISR & BIT(chan)) == BIT(chan)) {
 	  uint16_t rslt = ADC->ADC_CDR[chan];
+    //rslt = mapRes(rslt, 12, 10);
 	  return rslt;
   }
   else {

@@ -894,9 +894,9 @@ void tp_init() {
   // Set analog inputs
   
   // Setup channels
-
-    ADC->ADC_MR |= ADC_MR_FREERUN_ON |
-    		  	  	 ADC_MR_LOWRES_BITS_12;
+    #ifdef __SAM3X8E__
+    ADC->ADC_MR |= ADC_MR_FREERUN_ON | ADC_MR_LOWRES_BITS_12;
+    #endif
 
     #define START_TEMP(temp_id) startAdcConversion(pinToAdcChannel(TEMP_## temp_id ##_PIN))
     #define START_BED_TEMP() startAdcConversion(pinToAdcChannel(TEMP_BED_PIN))

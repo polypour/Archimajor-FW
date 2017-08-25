@@ -51,7 +51,7 @@ typedef unsigned long millis_t;
   #else
     #define MYSERIAL Serial
   #endif // BTENABLED
-#elif MOTHERBOARD == BOARD_AMBIT
+#elif MOTHERBOARD == BOARD_AMBIT || MOTHERBOARD == BOARD_FEYNMANRAMBO
   #define MYSERIAL SerialUSB
 #else
   #ifndef MYSERIAL

@@ -11,10 +11,9 @@ Joao Diogo Falcao
 Licence: GPL
 
 ****************************************************************************************************/
-
 #ifndef PLATFORM_H
 #define PLATFORM_H
-
+#ifdef __SAM3X8E__ //only __SAM3X8E__
 
 #define SD_DEBUG true
 
@@ -319,5 +318,5 @@ static const uint8_t PIN_HSMCI_MCDA3_GPIO_ARDUINO  = 55;
 
 extern MassStorage SD;
 
-
+#endif //only __SAM3X8E__
 #endif

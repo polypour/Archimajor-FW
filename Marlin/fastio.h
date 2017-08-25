@@ -45,26 +45,37 @@
 //#define	READ(pin)  PIO_Get(g_APinDescription[pin].pPort, PIO_INPUT, g_APinDescription[pin].ulPin)
 /// write to a pin
 //#define	WRITE(pin, v) do{if(v) {g_APinDescription[pin].pPort->PIO_SODR = g_APinDescription[pin].ulPin;} else {g_APinDescription[pin].pPort->PIO_CODR = g_APinDescription[pin].ulPin; }}while(0)
-  
+
+
+#if SAMG //FEYNMAN
+#define PIO_Configure pio_configure
+#define PIO_Get pio_get
+#endif
+
 static inline void digitalFastWrite(int pin, bool v) {
   if (v) g_APinDescription[pin].pPort->PIO_SODR = g_APinDescription[pin].ulPin;
   else g_APinDescription[pin].pPort->PIO_CODR = g_APinDescription[pin].ulPin;
 }
 
-// static inline bool digitalFastRead(int pin) {
-  // return PIO_Get(g_APinDescription[pin].pPort, PIO_INPUT, g_APinDescription[pin].ulPin);
-// }
+static inline bool digitalFastRead(int pin) {
+  return PIO_Get(g_APinDescription[pin].pPort, PIO_INPUT, g_APinDescription[pin].ulPin);
+}
 
+#ifdef __SAM3X8E__ //fastio pin map is for __SAM3X8E__
 #define _FASTREAD(IO) ((bool)(DIO ## IO ## _WPORT -> PIO_PDSR & (MASK(DIO ## IO ## _PIN))))
 
 #define _FASTWRITE(IO, v) do {  if (v) {DIO ## IO ## _WPORT -> PIO_SODR = MASK(DIO ## IO ##_PIN); } \
                                 else {DIO ##  IO ## _WPORT -> PIO_CODR = MASK(DIO ## IO ## _PIN); }; \
                           } while (0)
-
-// #define READ(pin) digitalFastRead(pin)
 #define READ(pin) _FASTREAD(pin)
-#define WRITE_VAR(pin, v) digitalFastWrite(pin, v)
 #define WRITE(pin, v) _FASTWRITE(pin, v)
+
+#else //other processors
+  #define READ(pin) digitalFastRead(pin)
+  #define WRITE(pin, v) digitalFastWrite(pin, v)
+#endif
+
+#define WRITE_VAR(pin, v) digitalFastWrite(pin, v)
 
 #define	SET_INPUT(pin) pmc_enable_periph_clk(g_APinDescription[pin].ulPeripheralId); \
     PIO_Configure(g_APinDescription[pin].pPort, PIO_INPUT, g_APinDescription[pin].ulPin, 0) 
@@ -92,7 +103,7 @@ static inline void digitalFastWrite(int pin, bool v) {
 /*
 ** direct pins
 */
-
+#ifdef __SAM3X8E__ //fastio pin map is for __SAM3X8E__
 #define DIO0_PIN 8
 #define DIO0_WPORT PIOA
 
@@ -417,4 +428,6 @@ static inline void digitalFastWrite(int pin, bool v) {
 
 #define DIO107_PIN 10
 #define DIO107_WPORT PIOB
+
+#endif //fastio pin map is for __SAM3X8E__
 #endif	/* _FASTIO_H */

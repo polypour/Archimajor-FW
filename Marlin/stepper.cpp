@@ -1222,9 +1222,10 @@ void microstep_init() {
 
 void microstep_ms(uint8_t driver, int8_t ms3, int8_t ms2, int8_t ms1) 
 {
+  #if ENABLED(X_MS3_PIN) //prevent compile errors if not using microstep mode pins
   switch(driver) {
     case 0: 
-      if(ms1 > -1) digitalWrite(X_MS1_PIN, ms1); 
+      if(ms1 > -1) digitalWrite(X_MS1_PIN, ms1);
       if(ms2 > -1) digitalWrite(X_MS2_PIN, ms2); 
       if(ms3 > -1) digitalWrite(X_MS3_PIN, ms3); 
       break;
@@ -1249,6 +1250,7 @@ void microstep_ms(uint8_t driver, int8_t ms3, int8_t ms2, int8_t ms1)
       if(ms3 > -1) digitalWrite(E1_MS3_PIN, ms3);
       break;
   }
+  #endif
 }
 
 void microstep_mode(uint8_t driver, uint8_t stepping_mode) {

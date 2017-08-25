@@ -28,6 +28,8 @@
   #include "pins_RAMPS4DUE.h"
 #elif MB(AMBIT)
   #include "pins_AMBIT.h"
+#elif MB(FEYNMANRAMBO)
+  #include "pins_FEYNMANRAMBO.h"
 #else
   #error Unknown MOTHERBOARD value set in Configuration.h
 #endif

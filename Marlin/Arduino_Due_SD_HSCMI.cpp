@@ -1,3 +1,4 @@
+#ifdef __SAM3X8E__ //only __SAM3X8E__
 #include "Arduino_Due_SD_HSCMI.h"
 #include <SD_HSMCI.h>
 
@@ -941,5 +942,5 @@ float FileStore::GetAndClearLongestWriteTime()
 uint32_t FileStore::longestWriteTime = 0;
 
 MassStorage SD;
-
+#endif //__SAM3X8E__ only
 //***************************************************************************************************

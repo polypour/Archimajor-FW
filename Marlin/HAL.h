@@ -36,9 +36,49 @@
 #include "Arduino.h"
 #include "fastio.h"
 
+#if SAMG //FEYNMAN - SAMG55 ASF drivers
+#include <adc2.h>
+#include <pmc.h>
+#include <tc.h>
+#endif
+
 // --------------------------------------------------------------------------
 // Defines
 // --------------------------------------------------------------------------
+/*
+//LIBSAM "TC" TO ATMEL ASF "TC" DRIVER API
+#define TC_Start tc_start
+#define TC_Stop tc_stop
+#define PIO_Set pio_set
+#define PIO_Clear pio_clear
+#define TC_Configure tc_init
+#define TC_SetRA tc_write_ra
+#define TC_SetRC tc_write_rc
+#define PIO_Get pio_get
+#define TC_ReadCV tc_read_cv
+#define TC_GetStatus tc_get_status
+*/
+// ---
+// Defines
+// ---
+#if SAMG //FEYNMAN
+#define PIO_Configure pio_configure
+#define PIO_GetOutputDataStatus pio_get_output_data_status
+#define PIO_SetOutput pio_set_output
+#define PIO_PullUp pio_pull_up
+#define PIO_Set pio_set
+#define PIO_Clear pio_clear
+#define PIO_Get pio_get
+#define TC_Start tc_start
+#define TC_Stop tc_stop
+#define TC_Configure tc_init
+#define TC_SetRA tc_write_ra
+#define TC_SetRC tc_write_rc
+#define TC_ReadCV tc_read_cv
+#define TC_GetStatus tc_get_status
+#define TC_SetRB tc_write_rb
+typedef enum adc_channel_num adc_channel_num_t;
+#endif //SAMG - FEYNMAN
 
 #define analogInputToDigitalPin(IO) IO
 #define FORCE_INLINE __attribute__((always_inline)) inline

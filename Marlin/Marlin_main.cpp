@@ -5621,7 +5621,7 @@ void process_next_command() {
           gcode_M280();
           break;
       #endif // NUM_SERVOS > 0
-      
+      #ifdef EEPROM_SETTINGS
         case 281: // SPIFLASH INIT
           spiflash_init();
           break;
@@ -5646,7 +5646,7 @@ void process_next_command() {
           spiflash_write_byte(2,37);
           SerialUSB.print("ReadByte: "); SerialUSB.println(spiflash_read_byte(2));
           break;
-      
+      #endif //EEPROM_SETTINGS
       #if HAS_BUZZER
         case 300: // M300 - Play beep tone
           gcode_M300();
