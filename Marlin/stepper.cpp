@@ -29,6 +29,7 @@
 #include "ultralcd.h"
 #include "language.h"
 #include "cardreader.h"
+#include "tmc2130.h"
 #if HAS_DIGIPOTSS
   #include <SPI.h>
 #endif
@@ -794,6 +795,7 @@ HAL_STEP_TIMER_ISR {
 #endif // ADVANCE
 
 void st_init() {
+  tmc2130_init();
   digipot_init(); //Initialize Digipot Motor Current
   microstep_init(); //Initialize Microstepping Pins
 

@@ -32,6 +32,7 @@
 
 #include "Configuration.h"
 #include "pins.h"
+#include "macros.h"
 
 #ifdef SDHSMCI_SUPPORT
   #include <SD_HSMCI.h>
@@ -56,4 +57,8 @@
 
 #if defined(DIGIPOT_I2C)
   #include <Wire.h>
+#endif
+
+#if ENABLED(HAVE_TMC2130_DRIVERS)
+  #include <SPI.h>
 #endif

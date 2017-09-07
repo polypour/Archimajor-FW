@@ -337,6 +337,13 @@ int HAL_timer_get_count (uint8_t timer_num) {
 	return tc->TC_CHANNEL[channel].TC_RC;
 }
 
+void HAL_timer_set_count (uint8_t timer_num, uint32_t count)
+{
+  const tTimerConfig *pConfig = &TimerConfig [timer_num];
+
+  TC_SetRC (pConfig->pTimerRegs, pConfig->channel, count);
+}
+
 // Due have no tone, this is from Repetier 0.92.3
 static uint32_t tone_pin;
 

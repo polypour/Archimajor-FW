@@ -181,6 +181,7 @@ void HAL_timer_isr_status (Tc* tc, uint32_t channel) {
 }
 
 int HAL_timer_get_count (uint8_t timer_num);
+void HAL_timer_set_count (uint8_t timer_num, uint32_t count);
 //
 
 void tone(uint8_t pin, int frequency);

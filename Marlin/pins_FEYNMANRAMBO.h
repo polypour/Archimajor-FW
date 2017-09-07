@@ -7,6 +7,7 @@
  #error Oops!  Make sure you have 'Feynman' selected from the 'Tools -> Boards' menu.
 #endif
 #define KNOWN_BOARD 1
+#define HAVE_TMC2130_DRIVERS 1
 
 //SAMG55 XPLAINED PRO
 //PA02 SW0
@@ -45,27 +46,31 @@
 //#undef HEATER_3_PIN
 //#undef TEMP_3_PIN
 
-#define X_STEP_PIN          0 //42 //PB10
-#define X_DIR_PIN           1 //43 //PB11
-#define X_ENABLE_PIN        3 //46 //PB14
-#define X_MIN_PIN          -1
+#define X_STEP_PIN          23 //42 //PB10
+#define X_DIR_PIN           0 ///1 //43 //PB11
+#define X_ENABLE_PIN        -1 //3 //46 //PB14
+#define X_MIN_PIN           2
 #define X_MAX_PIN          -1
+#define X_TMC2130_CS       14 //25 //18
 
-#define Y_STEP_PIN          12
-#define Y_DIR_PIN           14
-#define Y_ENABLE_PIN        13
+#define Y_STEP_PIN          29 ///12
+#define Y_DIR_PIN           24 ///14
+#define Y_ENABLE_PIN        -1 //13
 #define Y_MIN_PIN          -1
 #define Y_MAX_PIN          -1
+#define Y_TMC2130_CS       12 //19
 
-#define Z_STEP_PIN          9
-#define Z_DIR_PIN          10
-#define Z_ENABLE_PIN       11
+#define Z_STEP_PIN         43 /// 9
+#define Z_DIR_PIN          42 ///18 //10
+#define Z_ENABLE_PIN       -1 //11
 #define Z_MIN_PIN          -1
 #define Z_MAX_PIN          -1
+#define Z_TMC2130_CS       30 //25 //20
 
-#define E0_STEP_PIN        4
-#define E0_DIR_PIN         6 //Yellow LED
-#define E0_ENABLE_PIN      5
+#define E0_STEP_PIN        13 //43 //4
+#define E0_DIR_PIN         11 //42 //6 //Yellow LED
+#define E0_ENABLE_PIN      -1 //5
+#define E0_TMC2130_CS      26 //21
 
 #define E1_STEP_PIN        -1
 #define E1_DIR_PIN         -1

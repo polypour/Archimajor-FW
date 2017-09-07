@@ -51,6 +51,7 @@
 #include "pins_arduino.h"
 #include "math.h"
 #include "buzzer.h"
+#include "tmc2130.h"
 
 #ifdef BLINKM
   #include "blinkm.h"
@@ -5647,6 +5648,22 @@ void process_next_command() {
           SerialUSB.print("ReadByte: "); SerialUSB.println(spiflash_read_byte(2));
           break;
       #endif //EEPROM_SETTINGS
+
+      #if ENABLED(HAVE_TMC2130_DRIVERS)
+        case 290: //MANUAL INIT TMC2130
+          SerialUSB.println("tmc2130_init() called.");
+          tmc2130_init();
+          break;
+        case 291:
+          pinMode(26,OUTPUT);
+          digitalWrite(26,HIGH);
+          break;
+        case 292:
+          pinMode(26,OUTPUT);
+          digitalWrite(26,LOW);
+          break;
+      #endif // HAVE_TMC2130_DRIVERS
+
       #if HAS_BUZZER
         case 300: // M300 - Play beep tone
           gcode_M300();
