@@ -19,7 +19,7 @@
  */
 #ifdef THERMAL_PROTECTION_HOTENDS
   #define THERMAL_PROTECTION_PERIOD 40        // Seconds
-  #define THERMAL_PROTECTION_HYSTERESIS 4     // Degrees Celsius
+  #define THERMAL_PROTECTION_HYSTERESIS 7     // Degrees Celsius
 
   /**
    * Whenever an M104 or M109 increases the target temperature the firmware will wait for the
@@ -27,8 +27,8 @@
    * degrees, the machine is halted, requiring a hard reset. This test restarts with any M104/M109,
    * but only if the current temperature is far enough below the target for a reliable test.
    */
-  #define WATCH_TEMP_PERIOD 16                // Seconds
-  #define WATCH_TEMP_INCREASE 4               // Degrees Celsius
+  #define WATCH_TEMP_PERIOD 50                // Seconds
+  #define WATCH_TEMP_INCREASE 2               // Degrees Celsius
 #endif
 
 #ifdef THERMAL_PROTECTION_BED
@@ -62,7 +62,7 @@
 
 //Show Temperature ADC value
 //The M105 command return, besides traditional information, the ADC value read from temperature sensors.
-//#define SHOW_TEMP_ADC_VALUES
+#define SHOW_TEMP_ADC_VALUES
 
 // @section extruder
 

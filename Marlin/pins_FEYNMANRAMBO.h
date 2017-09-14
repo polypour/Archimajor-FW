@@ -49,21 +49,21 @@
 #define X_STEP_PIN          23 //42 //PB10
 #define X_DIR_PIN           0 ///1 //43 //PB11
 #define X_ENABLE_PIN        -1 //3 //46 //PB14
-#define X_MIN_PIN           2
+#define X_MIN_PIN           1
 #define X_MAX_PIN          -1
 #define X_TMC2130_CS       14 //25 //18
 
 #define Y_STEP_PIN          29 ///12
 #define Y_DIR_PIN           24 ///14
 #define Y_ENABLE_PIN        -1 //13
-#define Y_MIN_PIN          -1
+#define Y_MIN_PIN          35 //PB03
 #define Y_MAX_PIN          -1
 #define Y_TMC2130_CS       12 //19
 
 #define Z_STEP_PIN         43 /// 9
 #define Z_DIR_PIN          42 ///18 //10
 #define Z_ENABLE_PIN       -1 //11
-#define Z_MIN_PIN          -1
+#define Z_MIN_PIN          40 //PB08
 #define Z_MAX_PIN          -1
 #define Z_TMC2130_CS       30 //25 //20
 
@@ -136,13 +136,13 @@
 #define HEATER_0_PIN        16
 #define HEATER_1_PIN        -1
 #define HEATER_2_PIN        -1
-#define HEATER_BED_PIN      -1
+#define HEATER_BED_PIN      31
 
 
 
 #define TEMP_0_PIN          17
 #define TEMP_1_PIN          -1
-#define TEMP_BED_PIN        -1
+#define TEMP_BED_PIN        18
 #define TEMP_2_PIN          -1
 
 #ifdef Z_PROBE_SLED

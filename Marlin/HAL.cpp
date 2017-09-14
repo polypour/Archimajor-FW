@@ -397,6 +397,7 @@ HAL_BEEPER_TIMER_ISR {
 // --------------------------------------------------------------------------
 // ADC
 // --------------------------------------------------------------------------
+// Derived from RepRap FiveD extruder::getTemperature()
 static inline uint32_t mapRes(uint32_t value, uint32_t from, uint32_t to) {
   if (from == to)
     return value;
@@ -405,11 +406,31 @@ static inline uint32_t mapRes(uint32_t value, uint32_t from, uint32_t to) {
   else
     return value << (to-from);
 }
+
+uint16_t getAdcReading3(adc_channel_num_t chan)
+{
+  while (!((ADC->ADC_ISR & BIT(chan)) == BIT(chan)));
+  
+  uint16_t rslt = ADC->ADC_CDR[chan];
+
+  startAdcConversion(chan);
+
+  return rslt;
+}
+
 uint16_t getAdcReading(adc_channel_num_t chan)
 {
+  //static uint32_t mytimer = 0;
 	if ((ADC->ADC_ISR & BIT(chan)) == BIT(chan)) {
 		uint16_t rslt = ADC->ADC_CDR[chan];
 		ADC->ADC_CHDR |= BIT(chan);
+   /*
+    if(millis() > mytimer) {
+      SerialUSB.print("raw_adc: ");
+      SerialUSB.print(rslt);
+      mytimer = millis() + 5000;
+    }*/
+    
     //rslt = mapRes(rslt, 12, 10);
 		return rslt;
 	}
@@ -436,10 +457,17 @@ adc_channel_num_t pinToAdcChannel(int pin)
 
 uint16_t getAdcFreerun(adc_channel_num_t chan, bool wait_for_conversion)
 {
+  //static uint32_t mytimer = 0;
   if (wait_for_conversion) while (!((ADC->ADC_ISR & BIT(chan)) == BIT(chan)));
   if ((ADC->ADC_ISR & BIT(chan)) == BIT(chan)) {
 	  uint16_t rslt = ADC->ADC_CDR[chan];
     //rslt = mapRes(rslt, 12, 10);
+    //rslt = rslt / 4;
+    //if(millis() > mytimer) {
+    //  SerialUSB.print("mapRes raw_adc: ");
+    //  SerialUSB.print(rslt);
+    //  mytimer = millis() + 5000;
+    //}
 	  return rslt;
   }
   else {

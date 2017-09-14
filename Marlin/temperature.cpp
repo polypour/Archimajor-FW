@@ -707,7 +707,8 @@ void manage_heater() {
 #define PGM_RD_W(x)   (short)pgm_read_word(&x)
 // Derived from RepRap FiveD extruder::getTemperature()
 // For hot end temperature measurement.
-static float analog2temp(int raw, uint8_t e) {
+//static
+float analog2temp(int raw, uint8_t e) {
   #ifdef TEMP_SENSOR_1_AS_REDUNDANT
     if (e > EXTRUDERS)
   #else
@@ -895,17 +896,21 @@ void tp_init() {
   
   // Setup channels
     #ifdef __SAM3X8E__
-    ADC->ADC_MR |= ADC_MR_FREERUN_ON | ADC_MR_LOWRES_BITS_12;
+    ADC->ADC_MR |= ADC_MR_LOWRES_BITS_12;
     #endif
+
+    //ADC->ADC_MR |= ADC_MR_FREERUN_ON;
+
+    analogReadResolution(12);
 
     #define START_TEMP(temp_id) startAdcConversion(pinToAdcChannel(TEMP_## temp_id ##_PIN))
     #define START_BED_TEMP() startAdcConversion(pinToAdcChannel(TEMP_BED_PIN))
 
     #if HAS_TEMP_0
-      START_TEMP(0);
+      //START_TEMP(0);
     #endif
     #if HAS_TEMP_BED
-      START_BED_TEMP();
+      //START_BED_TEMP();
     #endif
     #if HAS_TEMP_1
       START_TEMP(1);
@@ -1402,13 +1407,24 @@ HAL_TEMP_TIMER_ISR {
     } // (pwm_count % 64) == 0
   
   #endif // SLOW_PWM_HEATERS
-  
-  #define READ_TEMP(temp_id) temp_read = getAdcFreerun(pinToAdcChannel(TEMP_## temp_id ##_PIN)); \
+
+
+  #define READ_TEMP(temp_id) temp_read = analogRead(TEMP_## temp_id ##_PIN); \
     raw_temp_value[temp_id] += temp_read; \
     max_temp[temp_id] = max(max_temp[temp_id], temp_read); \
     min_temp[temp_id] = min(min_temp[temp_id], temp_read)
     
-  #define READ_BED_TEMP(temp_id) temp_read = getAdcFreerun(pinToAdcChannel(TEMP_BED_PIN)); \
+  #define READ_BED_TEMP(temp_id) temp_read = analogRead(TEMP_BED_PIN); \
+    raw_temp_bed_value += temp_read; \
+    max_temp[temp_id] = max(max_temp[temp_id], temp_read); \
+    min_temp[temp_id] = min(min_temp[temp_id], temp_read)
+  
+  #define READ_TEMP2(temp_id) temp_read = getAdcReading(pinToAdcChannel(TEMP_## temp_id ##_PIN)); \
+    raw_temp_value[temp_id] += temp_read; \
+    max_temp[temp_id] = max(max_temp[temp_id], temp_read); \
+    min_temp[temp_id] = min(min_temp[temp_id], temp_read)
+    
+  #define READ_BED_TEMP2(temp_id) temp_read = getAdcReading(pinToAdcChannel(TEMP_BED_PIN)); \
     raw_temp_bed_value += temp_read; \
     max_temp[temp_id] = max(max_temp[temp_id], temp_read); \
     min_temp[temp_id] = min(min_temp[temp_id], temp_read)
