@@ -119,7 +119,9 @@ void tmc2130_init()
   #ifdef HAVE_TMC2130_DRIVERS
   uint8_t cs[4] = { X_TMC2130_CS, Y_TMC2130_CS, Z_TMC2130_CS, E0_TMC2130_CS };
   //uint8_t current[4] = { 23, 23, 23, 23 };
-  uint8_t current[4] = { 18, 18, 18, 18 };
+  //uint8_t current[4] = { 18, 18, 18, 18 }; //108C drivers on eval board. 78C on Y motor.
+  //uint8_t current[4] = { 16, 16, 16, 13 }; //motors too hot
+  uint8_t current[4] = { 14, 14, 16, 11 };
 
   //pinMode(PIN_SPI_SS0,OUTPUT);  // PA25
   pinMode(PIN_SPI_MOSI,OUTPUT); // PA10
@@ -159,10 +161,16 @@ void tmc2130_init()
     //tmc2130_write(cs[i],0x6C,0b10100,01,00,0xC5);
     //tmc2130_chopconf(cs[i],1,16); // 16 Microstepping to 256 microstepping
     tmc2130_write(cs[i],0x6C,0,01,0,0); // START WITH MOTORS DISABLE (NO ENABLE PIN USED)
-    tmc2130_write(cs[i],0x10,0,15,current[i],current[i]); //0x10 IHOLD_IRUN
-    tmc2130_write(cs[i],0x0,0,0,0,0b000); //address=0x0 GCONF EXT VREF - STEALTH CHOP
+    if(i==2) { //Z SETTINGS
+      tmc2130_write(cs[i],0x10,0,15,current[i],current[i]-4); //0x10 IHOLD_IRUN
+      tmc2130_write(cs[i],0x0,0,0,0,0b000); //address=0x0 GCONF EXT VREF - STEALTH CHOP
+    }
+    else {
+      tmc2130_write(cs[i],0x10,0,15,current[i],7); //0x10 IHOLD_IRUN
+      tmc2130_write(cs[i],0x0,0,0,0,0b100); //address=0x0 GCONF EXT VREF - STEALTH CHOP
+    }
     //tmc2130_write(cs[i],0x11,0,0,0,0xA);
-    tmc2130_write(cs[i],0x70,0,0b111,0x01,0xC8); //address=0x70 PWM_CONF //reset default=0x00050480
+    tmc2130_write(cs[i],0x70,0,0b100,0x01,0xC8); //address=0x70 PWM_CONF //reset default=0x00050480
 
     tmc2130_en_state[i] = false;
   }

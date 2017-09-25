@@ -210,10 +210,18 @@ Here are some standard links for getting your machine calibrated:
   //#define  DEFAULT_Ki 3.68
   //#define  DEFAULT_Kd 148.09
 
-//M304 P34 I2.11 D137
-#define  DEFAULT_Kp 33.56
-#define  DEFAULT_Ki 2.11
-#define  DEFAULT_Kd 133.42
+//Makergear 12V black aluminum block with catridge hotend.
+#define  DEFAULT_Kp 22.76
+#define  DEFAULT_Ki 1.46
+#define  DEFAULT_Kd 88.94
+//#define  DEFAULT_Kp 22.00
+//#define  DEFAULT_Ki 1.32
+//#define  DEFAULT_Kd 91.91
+
+//M304 P34 I2.11 D137 //HEXAGON 24V AS USED ON THE ULTI2012 MF.MENDEL
+//#define  DEFAULT_Kp 33.56
+//#define  DEFAULT_Ki 2.11
+//#define  DEFAULT_Kd 133.42
 /* FEYMAN OLD BAD
 #define  DEFAULT_Kp 30.05
 #define  DEFAULT_Ki 1.77
@@ -580,7 +588,7 @@ const bool Z_PROBE_ENDSTOP_INVERTING = false; // set to true to invert the logic
 
 // default settings
 
-#define DEFAULT_AXIS_STEPS_PER_UNIT   {160,160,5120,1424}  // default steps per unit for Ultimaker //1424 //489
+#define DEFAULT_AXIS_STEPS_PER_UNIT   {160,160,5120,1338.56}  // New Gregs gear has a 0.94 ratio of the old gear //1424 //489
 #define DEFAULT_MAX_FEEDRATE          {150, 150, 3, 25}    // (mm/sec)
 #define DEFAULT_MAX_ACCELERATION      {3000,3000,100,10000}    // X, Y, Z, E maximum start speed for accelerated moves. E default values are good for Skeinforge 40+, for older versions raise them a lot.
 // #define ENABLE_HIGH_SPEED_STEPPING  // Activate for very high stepping rates, normally only needed for 1/64 or more micro steps (AXIS_STEPS_PER_UNIT * MAX_FEEDRATE > 150,000)
