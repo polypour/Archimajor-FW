@@ -9,6 +9,7 @@
 #define BOARD_RAMPS4DUE     433  // RAMPS4DUE with AndrewBCN's RAMPS mods (http://forums.reprap.org/read.php?219,479626,page=1)
 #define BOARD_AMBIT         303  // AMBIT (Rambo32 SAM3X8E + DRV8825)
 #define BOARD_FEYNMANRAMBO         304  // FEYNMAN (SAMG55 + 4 TMC drivers)
+#define BOARD_ARCHIM2         305  // ARCHIM2 (SAM3X8E + 5 TMC2130 drivers)
 
 #define MB(board) (MOTHERBOARD==BOARD_##board)
 

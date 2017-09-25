@@ -72,7 +72,8 @@ void tmc2130_chopconf(uint8_t cs, bool extrapolate256 = 1, uint16_t microstep_re
 
   tmc2130_write(cs,0x6C,mres,1,00,0xC5);
 }
-#endif //HAVE_TMC2130_DRIVERS
+
+#endif //ENABLED(HAVE_TMC2130_DRIVERS)
 
 void tmc2130_init2()
 {
@@ -178,6 +179,8 @@ void tmc2130_init()
   #endif //HAVE_TMC2130_DRIVERS
 }
 
+#if ENABLED(HAVE_TMC2130_DRIVERS)
+
 void tmc2130_disable_motors()
 {
   uint8_t cs[4] = { X_TMC2130_CS, Y_TMC2130_CS, Z_TMC2130_CS, E0_TMC2130_CS };
@@ -214,3 +217,5 @@ void tmc2130_enable_motor(uint8_t motor)
     HAL_timer_set_count (STEP_TIMER_NUM, HAL_TIMER_RATE / 1000);
   }
 }
+
+#endif //HAVE_TMC2130_DRIVERS
