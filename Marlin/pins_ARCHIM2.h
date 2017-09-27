@@ -9,15 +9,16 @@
 
 #define KNOWN_BOARD 1
 #define HAVE_TMC2130_DRIVERS 1
+#define TMC2130_USES_SW_SPI
 
-//#undef DIGIPOTSS_PIN
-//#undef HEATER_3_PIN
-//#undef TEMP_3_PIN
+#define TMC_SWSPI_MISO_PIN 26 //PD1 MISO
+#define TMC_SWSPI_SCK_PIN  27 //PD2 SCK
+#define TMC_SWSPI_MOSI_PIN 28 //PD3 MOSI
 
 // * on end means that it has changed from Archim version 1.0
 #define X_STEP_PIN         38 //PC6 X-STEP *
 #define X_DIR_PIN          37 //PC5 X-DIR *
-#define X_ENABLE_PIN       41 //PC9 EN1
+#define X_ENABLE_PIN       41 //PC9 X-EN
 #define X_MIN_PIN          14 //PD4 MIN ES1
 #define X_MAX_PIN          32 //PD10 MAX ES1
 #define X_TMC2130_CS       39 //PC7 X_nCS
@@ -33,7 +34,7 @@
 
 #define Z_STEP_PIN         46 //PC17 Z-STEP *
 #define Z_DIR_PIN          47 //PC16 Z-DIR *
-#define Z_ENABLE_PIN       44 //PC19 Z-END *
+#define Z_ENABLE_PIN       44 //PC19 Z-EN *
 #define Z_MIN_PIN          31 //PA7 MIN ES3
 #define Z_MAX_PIN          30 //PD9 MAX ES3
 #define Z_TMC2130_CS       45 //PC18 Z_nCS

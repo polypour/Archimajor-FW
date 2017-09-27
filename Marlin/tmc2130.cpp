@@ -6,6 +6,103 @@
 #if ENABLED(HAVE_TMC2130_DRIVERS)
 #include <SPI.h>
 
+#ifndef MYSERIAL
+  #define MYSERIAL(x)
+#endif
+
+
+#ifdef TMC2130_USES_SW_SPI
+  #define tmc_transfer(x) shiftData( TMC_SWSPI_MOSI_PIN, TMC_SWSPI_MISO_PIN, TMC_SWSPI_SCK_PIN, MSBFIRST, x)
+
+  //Combined shiftOut and shiftIn from Arduino wiring_shift.c
+  uint32_t shiftData( uint32_t ulDataOutPin,  uint32_t ulClockPin, uint32_t ulDataInPin, uint32_t ulBitOrder, uint32_t ulVal )
+  {
+    uint8_t value = 0 ;
+    uint8_t i ;
+
+    for ( i=0 ; i < 8 ; ++i )
+      {
+      // Write bit
+      if ( ulBitOrder == LSBFIRST )
+          {
+        digitalWrite( ulDataOutPin, !!(ulVal & (1 << i)) ) ;
+          }
+      else
+          {
+        digitalWrite( ulDataOutPin, !!(ulVal & (1 << (7 - i))) ) ;
+          }
+
+      // Start clock pulse
+      digitalWrite( ulClockPin, HIGH ) ;
+
+      // Read bit
+      if ( ulBitOrder == LSBFIRST )
+          {
+        value |= (digitalRead( ulDataInPin ) ? 1 : 0) << i ;
+          }
+      else
+          {
+        value |= (digitalRead( ulDataInPin ) ? 1 : 0) << (7 - i) ;
+          }
+
+      // Stop clock pulse
+      digitalWrite( ulClockPin, LOW ) ;
+    }
+
+    return value;
+  }
+#endif
+
+void tmc2130_transfer_begin() {
+  #ifdef TMC2130_USES_HW_SPI
+    SPI.beginTransaction(SPISettings(4000000, MSBFIRST, SPI_MODE3));
+  #endif
+}
+
+void tmc2130_transfer_end() {
+  #ifdef TMC2130_USES_HW_SPI
+    SPI.endTransaction();
+  #endif
+}
+
+void tmc2130_transfer(uint8_t val) {
+  #ifdef TMC2130_USES_HW_SPI
+    SPI.transfer(val);
+  #endif
+
+  #ifdef TMC2130_USES_SW_SPI
+    tmc_transfer(val);
+  #endif
+}
+
+void tmc2130_spi_init() {
+  uint8_t cs[4] = { X_TMC2130_CS, Y_TMC2130_CS, Z_TMC2130_CS, E0_TMC2130_CS };
+  //uint8_t current[4] = { 23, 23, 23, 23 };
+  //uint8_t current[4] = { 18, 18, 18, 18 }; //108C drivers on eval board. 78C on Y motor.
+  //uint8_t current[4] = { 16, 16, 16, 13 }; //motors too hot
+  uint8_t current[4] = { 14, 14, 16, 11 };
+
+  #ifdef TMC2130_USES_HW_SPI
+    //pinMode(PIN_SPI_SS0,OUTPUT);  // PA25
+    pinMode(PIN_SPI_MOSI,OUTPUT); // PA10
+    pinMode(PIN_SPI_SCK,OUTPUT);  // PB0
+  
+    SPI.end();
+    SPI.begin();
+  #endif
+
+  #ifdef TMC2130_USES_SW_SPI
+    pinMode(TMC_SWSPI_MISO_PIN, INPUT );
+    pinMode(TMC_SWSPI_SCK_PIN, OUTPUT );
+    pinMode(TMC_SWSPI_MOSI_PIN, OUTPUT );
+  #endif
+
+  for(int i=0;i<4;i++) {
+    digitalWrite(cs[i],HIGH);
+    pinMode(cs[i],OUTPUT);
+  }
+}
+
 void tmc2130_write(uint8_t chipselect, uint8_t address,uint8_t wval1,uint8_t wval2,uint8_t wval3,uint8_t wval4)
 {
   uint32_t val32;
@@ -16,7 +113,7 @@ void tmc2130_write(uint8_t chipselect, uint8_t address,uint8_t wval1,uint8_t wva
   uint8_t val4;
 
   //datagram1 - write
-  SPI.beginTransaction(SPISettings(4000000, MSBFIRST, SPI_MODE3));
+  tmc2130_transfer_begin();
   digitalWrite(chipselect,LOW);
   SPI.transfer(address+0x80);
   SPI.transfer(wval1);
@@ -24,10 +121,10 @@ void tmc2130_write(uint8_t chipselect, uint8_t address,uint8_t wval1,uint8_t wva
   SPI.transfer(wval3);
   SPI.transfer(wval4);
   digitalWrite(chipselect, HIGH);
-  SPI.endTransaction();
+  tmc2130_transfer_end();
 
   //datagram2 - response
-  SPI.beginTransaction(SPISettings(4000000, MSBFIRST, SPI_MODE3));
+  tmc2130_transfer_begin();
   digitalWrite(chipselect,LOW);
   val0 = SPI.transfer(0);
   val1 = SPI.transfer(0);
@@ -35,7 +132,7 @@ void tmc2130_write(uint8_t chipselect, uint8_t address,uint8_t wval1,uint8_t wva
   val3 = SPI.transfer(0);
   val4 = SPI.transfer(0);
   digitalWrite(chipselect, HIGH);
-  SPI.endTransaction();
+  tmc2130_transfer_end();
 
   MYSERIAL.print("WriteRead 0x");
   MYSERIAL.print(address,HEX);
@@ -124,38 +221,7 @@ void tmc2130_init()
   //uint8_t current[4] = { 16, 16, 16, 13 }; //motors too hot
   uint8_t current[4] = { 14, 14, 16, 11 };
 
-  //pinMode(PIN_SPI_SS0,OUTPUT);  // PA25
-  pinMode(PIN_SPI_MOSI,OUTPUT); // PA10
-  pinMode(PIN_SPI_SCK,OUTPUT);  // PB0
-
-
-  //digitalWrite(X_TMC2130_CS, HIGH);
-  //pinMode(X_TMC2130_CS,OUTPUT);
-/*
-  digitalWrite(Y_TMC2130_CS, HIGH);
-  digitalWrite(Z_TMC2130_CS, HIGH);
-  digitalWrite(E0_TMC2130_CS, HIGH);
-  pinMode(Y_TMC2130_CS,OUTPUT);
-  pinMode(Z_TMC2130_CS,OUTPUT);
-  pinMode(E0_TMC2130_CS,OUTPUT);
-*/
-  SPI.end();
-  SPI.begin();
-/*
-  uint8_t CURRENT0 = 17;
-  uint8_t CS0 = 26; //PIN_SPI_SS0;
-  digitalWrite(CS0,HIGH);
-  pinMode(CS0,OUTPUT);
-  
-  tmc2130_chopconf(CS0,1,16); // 16 Microstepping to 256 microstepping
-  tmc2130_write(CS0,0x10,0,15,CURRENT0,8); //0x10 IHOLD_IRUN
-  tmc2130_write(CS0,0x0,0,0,0,0b000); //address=0x0 GCONF EXT VREF - STEALTH CHOP
-  tmc2130_write(CS0,0x70,0,0b111,0x01,0xC8); //address=0x70 PWM_CONF //reset default=0x00050480
-  */
-  for(int i=0;i<4;i++) {
-    digitalWrite(cs[i],HIGH);
-    pinMode(cs[i],OUTPUT);
-  }
+  tmc2130_spi_init();
 
   for(int i=0;i<4;i++) //i<4
   {

@@ -381,6 +381,7 @@ static inline bool digitalFastRead(int pin) {
 #define DIO91_WPORT PIOB
 
 //EXTRA AMBIT PINS for AMBIT (32-bit version of RAMBo)
+#ifdef ARDUINO_SAM_ARCHIM
 #define DIO92_PIN 11
 #define DIO92_WPORT PIOC
 
@@ -428,6 +429,7 @@ static inline bool digitalFastRead(int pin) {
 
 #define DIO107_PIN 10
 #define DIO107_WPORT PIOB
+#endif //ARDUINO_SAM_ARCHIM
 
 #endif //fastio pin map is for __SAM3X8E__
 #endif	/* _FASTIO_H */

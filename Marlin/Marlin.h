@@ -116,7 +116,7 @@ void manage_inactivity(bool ignore_stepper_queue=false);
 #elif HAS_X_ENABLE
   #define  enable_x() X_ENABLE_WRITE( X_ENABLE_ON)
   #define disable_x() { X_ENABLE_WRITE(!X_ENABLE_ON); axis_known_position[X_AXIS] = false; }
-#elif ENABLED(HAVE_TMC2130_DRIVERS)
+#elif ENABLED(TMC2130_USES_SW_ENABLE)
   #define enable_x() tmc2130_enable_motor(0);
   #define disable_x() tmc2130_disable_motor(0);
 #else
@@ -132,7 +132,7 @@ void manage_inactivity(bool ignore_stepper_queue=false);
     #define  enable_y() Y_ENABLE_WRITE( Y_ENABLE_ON)
     #define disable_y() { Y_ENABLE_WRITE(!Y_ENABLE_ON); axis_known_position[Y_AXIS] = false; }
   #endif
-#elif ENABLED(HAVE_TMC2130_DRIVERS)
+#elif ENABLED(TMC2130_USES_SW_ENABLE)
   #define enable_y() tmc2130_enable_motor(1);
   #define disable_y() tmc2130_disable_motor(1);
 #else
@@ -148,7 +148,7 @@ void manage_inactivity(bool ignore_stepper_queue=false);
     #define  enable_z() Z_ENABLE_WRITE( Z_ENABLE_ON)
     #define disable_z() { Z_ENABLE_WRITE(!Z_ENABLE_ON); axis_known_position[Z_AXIS] = false; }
   #endif
-#elif ENABLED(HAVE_TMC2130_DRIVERS)
+#elif ENABLED(TMC2130_USES_SW_ENABLE)
   #define enable_z() tmc2130_enable_motor(2);
   #define disable_z() tmc2130_disable_motor(2);
 #else
@@ -159,7 +159,7 @@ void manage_inactivity(bool ignore_stepper_queue=false);
 #if HAS_E0_ENABLE
   #define enable_e0()  E0_ENABLE_WRITE( E_ENABLE_ON)
   #define disable_e0() E0_ENABLE_WRITE(!E_ENABLE_ON)
-#elif ENABLED(HAVE_TMC2130_DRIVERS)
+#elif ENABLED(TMC2130_USES_SW_ENABLE)
   #define enable_e0() tmc2130_enable_motor(3);
   #define disable_e0() tmc2130_disable_motor(3);
 #else
