@@ -65,13 +65,13 @@ void tmc2130_transfer_end() {
   #endif
 }
 
-void tmc2130_transfer(uint8_t val) {
+byte tmc2130_transfer(uint8_t val) {
   #ifdef TMC2130_USES_HW_SPI
-    SPI.transfer(val);
+    return SPI.transfer(val);
   #endif
 
   #ifdef TMC2130_USES_SW_SPI
-    tmc_transfer(val);
+    return tmc_transfer(val);
   #endif
 }
 
