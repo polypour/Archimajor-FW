@@ -65,6 +65,10 @@
   #include <SPI.h>
 #endif
 
+#ifdef HAVE_TMC2130_DRIVERS
+  #include "tmc2130.h"
+#endif
+
 /**
  * Look here for descriptions of G-codes:
  *  - http://linuxcnc.org/handbook/gcode/g-code.html
@@ -5646,6 +5650,12 @@ void process_next_command() {
           spiflash_write_byte(2,37);
           SerialUSB.print("ReadByte: "); SerialUSB.println(spiflash_read_byte(2));
           break;
+
+      #ifdef HAVE_TMC2130_DRIVERS
+        case 290: //tmc2130 init
+          SerialUSB.println("tmc2130 init");
+          tmc2130_init();
+      #endif
       
       #if HAS_BUZZER
         case 300: // M300 - Play beep tone

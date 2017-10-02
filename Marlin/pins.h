@@ -28,6 +28,8 @@
   #include "pins_RAMPS4DUE.h"
 #elif MB(AMBIT)
   #include "pins_AMBIT.h"
+#elif MB(ARCHIM2)
+  #include "pins_ARCHIM2.h"
 #else
   #error Unknown MOTHERBOARD value set in Configuration.h
 #endif

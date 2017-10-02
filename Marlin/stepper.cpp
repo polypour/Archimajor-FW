@@ -33,6 +33,10 @@
   #include <SPI.h>
 #endif
 
+#ifdef HAVE_TMC2130_DRIVERS
+  #include "tmc2130.h"
+#endif
+
 //===========================================================================
 //============================= public variables ============================
 //===========================================================================
@@ -1194,6 +1198,9 @@ void digipot_current(uint8_t driver, int current) {
 }
 
 void microstep_init() {
+  #ifdef HAVE_TMC2130_DRIVERS
+    tmc2130_init();
+  #endif
   #if HAS_MICROSTEPS_E1
     pinMode(E1_MS1_PIN,OUTPUT);
     pinMode(E1_MS2_PIN,OUTPUT);

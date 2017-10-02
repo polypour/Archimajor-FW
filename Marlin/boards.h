@@ -12,6 +12,7 @@
 #define BOARD_RAMPS_FD_V2	404  // RAMPS-FD V2
 #define BOARD_RAMPS4DUE     433  // RAMPS4DUE with AndrewBCN's RAMPS mods (http://forums.reprap.org/read.php?219,479626,page=1)
 #define BOARD_AMBIT         303  // AMBIT (Rambo32 SAM3X8E + DRV8825)
+#define BOARD_ARCHIM2       299  // Archim2 ( sam3x8e + tmc2130)
 
 #define MB(board) (MOTHERBOARD==BOARD_##board)
 
