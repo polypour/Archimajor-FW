@@ -65,6 +65,15 @@
   #include <SPI.h>
 #endif
 
+// Why are min and max not getting pulled in from wiring_constants.h
+#ifndef min
+#define min(a,b) ((a)<(b)?(a):(b))
+#endif // min
+
+#ifndef max
+#define max(a,b) ((a)>(b)?(a):(b))
+#endif // max
+
 /**
  * Look here for descriptions of G-codes:
  *  - http://linuxcnc.org/handbook/gcode/g-code.html
