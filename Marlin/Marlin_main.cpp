@@ -5417,6 +5417,23 @@ void process_next_command() {
         }
         break;
 
+      case 44: //M44 - Write pin state
+      {
+        int8_t pin=-1;
+        uint8_t value=0;
+        if ( code_seen('P') ) pin = (int8_t)code_value();
+        if ( code_seen('S') ) value = (uint8_t)code_value();
+
+        SerialUSB.print(PSTR("digitalWrite pin: "));
+        SerialUSB.print( pin );
+        SerialUSB.print(PSTR(" Value: "));
+        SerialUSB.print( value );
+
+        pinMode(pin,OUTPUT);
+        digitalWrite(pin,value);
+        break;
+      }
+
       #if defined(ENABLE_AUTO_BED_LEVELING) && defined(Z_PROBE_REPEATABILITY_TEST)
         case 48: // M48 Z-Probe repeatability
           gcode_M48();
