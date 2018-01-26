@@ -226,8 +226,8 @@ void tmc2130_init()
   for(int i=0;i<4;i++) //i<4
   {
     //tmc2130_write(cs[i],0x6C,0b10100,01,00,0xC5);
-    //tmc2130_chopconf(cs[i],1,16); // 16 Microstepping to 256 microstepping
-    tmc2130_write(cs[i],0x6C,0,01,0,0); // START WITH MOTORS DISABLE (NO ENABLE PIN USED)
+    tmc2130_chopconf(cs[i],1,16); // 16 Microstepping to 256 microstepping
+    //tmc2130_write(cs[i],0x6C,0,01,0,0); // START WITH MOTORS DISABLE (NO ENABLE PIN USED)
     if(i==2) { //Z SETTINGS
       tmc2130_write(cs[i],0x10,0,15,current[i],current[i]-4); //0x10 IHOLD_IRUN
       tmc2130_write(cs[i],0x0,0,0,0,0b000); //address=0x0 GCONF EXT VREF - STEALTH CHOP
