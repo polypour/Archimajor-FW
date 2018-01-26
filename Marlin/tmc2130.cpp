@@ -12,7 +12,7 @@
 
 
 #ifdef TMC2130_USES_SW_SPI
-  #define tmc_transfer(x) shiftData( TMC_SWSPI_MOSI_PIN, TMC_SWSPI_MISO_PIN, TMC_SWSPI_SCK_PIN, MSBFIRST, x)
+  #define tmc_transfer(x) shiftData( TMC_SWSPI_MOSI_PIN, TMC_SWSPI_SCK_PIN, TMC_SWSPI_MISO_PIN, MSBFIRST, x)
 
   //Combined shiftOut and shiftIn from Arduino wiring_shift.c
   uint32_t shiftData( uint32_t ulDataOutPin,  uint32_t ulClockPin, uint32_t ulDataInPin, uint32_t ulBitOrder, uint32_t ulVal )
