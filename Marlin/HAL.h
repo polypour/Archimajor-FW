@@ -188,14 +188,12 @@ void tone(uint8_t pin, int frequency);
 void noTone(uint8_t pin);
 //void tone(uint8_t pin, int frequency, long duration);
 
-//<<<<<<< HEAD
-
 uint8_t spiflash_busy();
 uint8_t spiflash_read_byte(long address);
 void spiflash_erase(long address);
 void spiflash_write_byte(long address, uint8_t value);
 void spiflash_init();
-//=======
+
 uint16_t getAdcReading(adc_channel_num_t chan);
 void startAdcConversion(adc_channel_num_t chan);
 adc_channel_num_t pinToAdcChannel(int pin);
@@ -203,7 +201,7 @@ adc_channel_num_t pinToAdcChannel(int pin);
 uint16_t getAdcFreerun(adc_channel_num_t chan, bool wait_for_conversion = false);
 uint16_t getAdcSuperSample(adc_channel_num_t chan);
 void stopAdcFreerun(adc_channel_num_t chan);
-//>>>>>>> wurst/master
+
 
 // --------------------------------------------------------------------------
 //
