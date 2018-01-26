@@ -131,7 +131,7 @@
 // Only a few motherboards support this, like RAMPS, which have dual extruder support (the 2nd, often unused, extruder driver is used
 // to control the 2nd Z axis stepper motor). The pins are currently only defined for a RAMPS motherboards.
 // On a RAMPS (or other 5 driver) motherboard, using this feature will limit you to using 1 extruder.
-//#define Z_DUAL_STEPPER_DRIVERS
+#define Z_DUAL_STEPPER_DRIVERS
 
 #ifdef Z_DUAL_STEPPER_DRIVERS
 
@@ -144,18 +144,18 @@
   // Play a little bit with small adjustments (0.5mm) and check the behaviour.
   // The M119 (endstops report) will start reporting the Z2 Endstop as well.
 
-  #define Z2_STEP_PIN E2_STEP_PIN           // Stepper to be used to Z2 axis.
-  #define Z2_DIR_PIN E2_DIR_PIN
-  #define Z2_ENABLE_PIN E2_ENABLE_PIN
+  //#define Z2_STEP_PIN E2_STEP_PIN           // Stepper to be used to Z2 axis.
+  //#define Z2_DIR_PIN E2_DIR_PIN
+  //#define Z2_ENABLE_PIN E2_ENABLE_PIN
 
   // #define Z_DUAL_ENDSTOPS
-
+/*
   #ifdef Z_DUAL_ENDSTOPS
     #define Z2_MAX_PIN 36                     //Endstop used for Z2 axis. In this case I'm using XMAX in a Rumba Board (pin 36)
     const bool Z2_MAX_ENDSTOP_INVERTING = false;
     #define DISABLE_XMAX_ENDSTOP              //Better to disable the XMAX to avoid conflict. Just rename "XMAX_ENDSTOP" by the endstop you are using for Z2 axis.
   #endif
-
+*/
 #endif // Z_DUAL_STEPPER_DRIVERS
 
 // Same again but for Y Axis.

@@ -106,12 +106,9 @@
 #undef Y2_DIR_PIN
 #undef Y2_ENABLE_PIN
 
-#define Z2_STEP_PIN        -1
-#define Z2_DIR_PIN         -1
-#define Z2_ENABLE_PIN      -1
-#undef Z2_STEP_PIN
-#undef Z2_DIR_PIN
-#undef Z2_ENABLE_PIN
+#define Z2_STEP_PIN        29 //PA29 S1_STEP
+#define Z2_DIR_PIN         24 //PA24 S1_DIR
+#define Z2_ENABLE_PIN       5 //PA5 STEP_EN
 /*
 #define MOTOR_CURRENT_PWM_X_PIN   12 //PD8  REF1 TIOB8
 #define MOTOR_CURRENT_PWM_Y_PIN   58 //PA6  REF2 TIOB2
