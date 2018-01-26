@@ -48,31 +48,31 @@
 //#undef HEATER_3_PIN
 //#undef TEMP_3_PIN
 
-#define X_STEP_PIN          29
-#define X_DIR_PIN           24
+#define X_STEP_PIN          43 //PB11 S2_STEP
+#define X_DIR_PIN           42 //PB10 S2_DIR
 #define X_ENABLE_PIN        -1
 #define X_MIN_PIN           -1
 #define X_MAX_PIN           -1
-#define X_TMC2130_CS        30
+#define X_TMC2130_CS        45 //PB13 S0_nCS
 
-#define Y_STEP_PIN          29
-#define Y_DIR_PIN           24
+#define Y_STEP_PIN          43 //PB11 S2_STEP
+#define Y_DIR_PIN           42 //PB10 S2_DIR
 #define Y_ENABLE_PIN        -1 //13
 #define Y_MIN_PIN          -1
 #define Y_MAX_PIN          -1
 #define Y_TMC2130_CS       47
 
-#define Z_STEP_PIN         29
-#define Z_DIR_PIN          24
-#define Z_ENABLE_PIN       -1 //11
+#define Z_STEP_PIN         23 //PA23 S0_STEP
+#define Z_DIR_PIN          46 //PB14 S0_DIR
+#define Z_ENABLE_PIN        5 //PA5 STEP_EN
 #define Z_MIN_PIN          -1
 #define Z_MAX_PIN          -1
-#define Z_TMC2130_CS       30 //25 //20
+#define Z_TMC2130_CS       30 //PA30 S2_nCS
 
-#define E0_STEP_PIN        29
-#define E0_DIR_PIN         24
+#define E0_STEP_PIN        43 //PB11 S2_STEP
+#define E0_DIR_PIN         42 //PB10 S2_DIR
 #define E0_ENABLE_PIN      -1 //5
-#define E0_TMC2130_CS      30 //21
+#define E0_TMC2130_CS      30 //PA30 S2_nCS
 
 #define E1_STEP_PIN        -1
 #define E1_DIR_PIN         -1
