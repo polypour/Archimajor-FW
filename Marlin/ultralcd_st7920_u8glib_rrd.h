@@ -31,6 +31,7 @@ static void ST7920_SWSPI_SND_8BIT(uint8_t val)
     delayMicroseconds(1);
     val<<=1;
     WRITE(ST7920_CLK_PIN,1);
+    delayMicroseconds(1);
   }
 }
 
