@@ -77,7 +77,7 @@ static inline void _delay_ms(uint32_t msec) {
 	delay(msec);
 }
 
-static inline void _delay_us(uint32_t usec) {
+static inline void hal_delay_us(uint32_t usec) {
   uint32_t n = usec * (F_CPU / 3000000);
   asm volatile(
       "L2_%=_delayMicroseconds:"       "\n\t"
@@ -169,4 +169,3 @@ void stopAdcFreerun(adc_channel_num_t chan);
 // --------------------------------------------------------------------------
 
 #endif // _HAL_H
-

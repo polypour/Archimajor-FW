@@ -1,3 +1,5 @@
+#include <SPIMemory.h>
+
 /*
    Contributors:
    Copyright (c) 2014 Bob Cousins bobcousins42@googlemail.com
@@ -116,6 +118,72 @@ int freeMemory() {
 #define SPIFLASH_SECTOR_ERASE  0x20  //Sector Erase (SE) (20h)
 #define SPIFLASH_READ_ID       0x90  //Read Manufacturer / Device ID
 
+SPIFlash flash(SPIFLASH_CS);
+
+void printUniqueID(void) {
+  long long _uniqueID = flash.getUniqueID();
+  if (_uniqueID) {
+    SerialUSB.print("Unique ID: ");
+    SerialUSB.print(uint32_t(_uniqueID / 1000000L));
+    SerialUSB.print(uint32_t(_uniqueID % 1000000L));
+    SerialUSB.print(", ");
+    SerialUSB.print("0x");
+    SerialUSB.print(uint32_t(_uniqueID >> 32), HEX);
+    SerialUSB.print(uint32_t(_uniqueID), HEX);
+  }
+}
+
+bool getID() {
+  SerialUSB.println();
+  SerialUSB.print("SPIMemory Library version: ");
+#ifdef LIBVER
+  uint8_t _ver, _subver, _bugfix;
+  flash.libver(&_ver, &_subver, &_bugfix);
+  SerialUSB.print(_ver);
+  SerialUSB.print(".");
+  SerialUSB.print(_subver);
+  SerialUSB.print(".");
+  SerialUSB.println(_bugfix);
+#else
+  SerialUSB.println(F("< 2.5.0"));
+#endif
+  SerialUSB.println();
+  uint32_t JEDEC = flash.getJEDECID();
+  if (!JEDEC) {
+    SerialUSB.println("No comms. Check wiring. Is chip supported? If unable to fix, raise an issue on Github");
+    return false;
+  }
+  else {
+    SerialUSB.print("JEDEC ID: 0x");
+    SerialUSB.println(JEDEC, HEX);
+    SerialUSB.print("Man ID: 0x");
+    SerialUSB.println(uint8_t(JEDEC >> 16), HEX);
+    SerialUSB.print("Memory ID: 0x");
+    SerialUSB.println(uint8_t(JEDEC >> 8), HEX);
+    SerialUSB.print("Capacity: ");
+    SerialUSB.println(flash.getCapacity());
+    SerialUSB.print("Max Pages: ");
+    SerialUSB.println(flash.getMaxPage());
+    printUniqueID();
+
+  }
+  return true;
+}
+
+void spiflash_init() {
+  flash.begin();
+  getID();
+}
+uint8_t spiflash_read_byte(long address) {
+  return flash.readByte(address);
+}
+void spiflash_erase(long address) {
+  flash.eraseSector(address);
+}
+void spiflash_write_byte(long address, uint8_t value) {
+  flash.writeByte(address, value);
+}
+/*
 void spiflash_init()
 {
   pinMode(SPIFLASH_CS,OUTPUT);
@@ -178,7 +246,7 @@ void spiflash_write_byte(long address, uint8_t value)
   SPI.transfer(SPIFLASH_CS, address, SPI_CONTINUE);
   SPI.transfer(SPIFLASH_CS, value); // Value to Write
 }
-
+*/
 
 // --------------------------------------------------------------------------
 // eeprom
