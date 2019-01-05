@@ -710,6 +710,26 @@ void setup() {
     pinMode(STAT_LED_BLUE, OUTPUT);
     digitalWrite(STAT_LED_BLUE, LOW); // turn it off
   #endif  
+
+  if( (SUPC->SUPC_SR >> 3) & 0x1 ) //Check for Brown Out Detection
+    switch ((RSTC->RSTC_SR >> 8) & 0x07) {
+      case 0: LCD_MESSAGEPGM("RST_POWER_ON: BOD!"); break;
+      case 1: LCD_MESSAGEPGM("RST_BACKUP: BOD!"); break;
+      case 2: LCD_MESSAGEPGM("RST_WATCHDOG: BOD!"); break;
+      case 3: LCD_MESSAGEPGM("RST_SOFTWARE: BOD!"); break;
+      case 4: LCD_MESSAGEPGM("RST_EXTERNAL: BOD!"); break;
+      default: LCD_MESSAGEPGM("RST_unknown: BOD!");
+    }
+  else
+    switch ((RSTC->RSTC_SR >> 8) & 0x07) {
+      case 0: LCD_MESSAGEPGM("RST_POWER_ON"); break;
+      case 1: LCD_MESSAGEPGM("RST_BACKUP"); break;
+      case 2: LCD_MESSAGEPGM("RST_WATCHDOG"); break;
+      case 3: LCD_MESSAGEPGM("RST_SOFTWARE"); break;
+      case 4: LCD_MESSAGEPGM("RST_EXTERNAL"); break;
+      default: LCD_MESSAGEPGM("RST_unknown");
+    }
+
 }
 
 /**
