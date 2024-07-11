@@ -14,11 +14,13 @@
  *
  */
 
-#define EEPROM_VERSION "V20"
+#define EEPROM_VERSION "V21"
 
 /**
- * V19 EEPROM Layout:
+ * V20 EEPROM Layout:
  *
+ *  Profile 1 of N, spaced in 512 byte chunks
+ *  =========================================
  *  ver
  *  M92 XYZE  axis_steps_per_unit (x4)
  *  M203 XYZE max_feedrate (x4)
@@ -99,15 +101,20 @@
   #include "mesh_bed_leveling.h"
 #endif
 
-void _EEPROM_writeData(int &pos, uint8_t* value, uint8_t size) {
+void _EEPROM_writeData(int profile_num, int &pos, uint8_t* value, uint8_t size) {
+  uint32_t globalpos = profile_num*512 + (long)pos;
   uint8_t c;
   while(size--) {
-    spiflash_write_byte((long)pos, *value);
+    spiflash_write_byte(globalpos, *value);
     //eeprom_write_byte((unsigned char*)pos, *value);
     _delay_ms(2);
     //c = eeprom_read_byte((unsigned char*)pos);
-    c = spiflash_read_byte( (long)pos );
+    c = spiflash_read_byte( globalpos );
     if (c != *value) {
+      SerialUSB.print(PSTR("profile#: "));
+      SerialUSB.print(profile_num+1);
+      SerialUSB.print(PSTR("global pos: "));
+      SerialUSB.print(globalpos);
       SerialUSB.print(PSTR("pos: "));
       SerialUSB.print(pos);
       SerialUSB.print(PSTR("  value: "));
@@ -117,25 +124,26 @@ void _EEPROM_writeData(int &pos, uint8_t* value, uint8_t size) {
       SERIAL_ECHO_START;
       SERIAL_ECHOLNPGM(MSG_ERR_EEPROM_WRITE);
     }
-    pos++;
+    globalpos++;
     value++;
   };
 }
-void _EEPROM_readData(int &pos, uint8_t* value, uint8_t size) {
+void _EEPROM_readData(int profile_num, int &pos, uint8_t* value, uint8_t size) {
+  uint32_t globalpos = profile_num*512 + (long)pos;
   do {
     //SerialUSB.print("readbyte: ");
-    *value = spiflash_read_byte((long)pos);
+    *value = spiflash_read_byte(globalpos);
     //SerialUSB.print(*value);
     //SerialUSB.print("  pos: ");
     //SerialUSB.print(pos);
     //*value = eeprom_read_byte((unsigned char*)pos);
-    pos++;
+    globalpos++;
     value++;
   } while (--size);
 }
 
-#define EEPROM_WRITE_VAR(pos, value) _EEPROM_writeData(pos, (uint8_t*)&value, sizeof(value))
-#define EEPROM_READ_VAR(pos, value) _EEPROM_readData(pos, (uint8_t*)&value, sizeof(value))
+#define EEPROM_WRITE_VAR(profile_num, pos, value) _EEPROM_writeData(profile_num, pos, (uint8_t*)&value, sizeof(value))
+#define EEPROM_READ_VAR(profile_num, pos, value) _EEPROM_readData(profile_num, pos, (uint8_t*)&value, sizeof(value))
 
 
 /**
@@ -148,7 +156,7 @@ void _EEPROM_readData(int &pos, uint8_t* value, uint8_t size) {
 
 #ifdef EEPROM_SETTINGS
 
-void Config_StoreSettings()  {
+void Config_StoreSettings(int profile_num)  {
   spiflash_init();
   float dummy = 0.0f;
   char ver[4] = "000";
@@ -156,19 +164,19 @@ void Config_StoreSettings()  {
   spiflash_erase(EEPROM_OFFSET);
   //EEPROM_WRITE_VAR(i, ver); // invalidate data first
   i=i+4;
-  EEPROM_WRITE_VAR(i, axis_steps_per_unit);
-  EEPROM_WRITE_VAR(i, max_feedrate);
-  EEPROM_WRITE_VAR(i, max_acceleration_units_per_sq_second);
-  EEPROM_WRITE_VAR(i, acceleration);
-  EEPROM_WRITE_VAR(i, retract_acceleration);
-  EEPROM_WRITE_VAR(i, travel_acceleration);
-  EEPROM_WRITE_VAR(i, minimumfeedrate);
-  EEPROM_WRITE_VAR(i, mintravelfeedrate);
-  EEPROM_WRITE_VAR(i, minsegmenttime);
-  EEPROM_WRITE_VAR(i, max_xy_jerk);
-  EEPROM_WRITE_VAR(i, max_z_jerk);
-  EEPROM_WRITE_VAR(i, max_e_jerk);
-  EEPROM_WRITE_VAR(i, home_offset);
+  EEPROM_WRITE_VAR(profile_num, i, axis_steps_per_unit);
+  EEPROM_WRITE_VAR(profile_num, i, max_feedrate);
+  EEPROM_WRITE_VAR(profile_num, i, max_acceleration_units_per_sq_second);
+  EEPROM_WRITE_VAR(profile_num, i, acceleration);
+  EEPROM_WRITE_VAR(profile_num, i, retract_acceleration);
+  EEPROM_WRITE_VAR(profile_num, i, travel_acceleration);
+  EEPROM_WRITE_VAR(profile_num, i, minimumfeedrate);
+  EEPROM_WRITE_VAR(profile_num, i, mintravelfeedrate);
+  EEPROM_WRITE_VAR(profile_num, i, minsegmenttime);
+  EEPROM_WRITE_VAR(profile_num, i, max_xy_jerk);
+  EEPROM_WRITE_VAR(profile_num, i, max_z_jerk);
+  EEPROM_WRITE_VAR(profile_num, i, max_e_jerk);
+  EEPROM_WRITE_VAR(profile_num, i, home_offset);
 
   uint8_t mesh_num_x = 3;
   uint8_t mesh_num_y = 3;
@@ -177,36 +185,36 @@ void Config_StoreSettings()  {
     typedef char c_assert[(sizeof(mbl.z_values) == MESH_NUM_X_POINTS*MESH_NUM_Y_POINTS*sizeof(dummy)) ? 1 : -1];
     mesh_num_x = MESH_NUM_X_POINTS;
     mesh_num_y = MESH_NUM_Y_POINTS;
-    EEPROM_WRITE_VAR(i, mbl.active);
-    EEPROM_WRITE_VAR(i, mesh_num_x);
-    EEPROM_WRITE_VAR(i, mesh_num_y);
-    EEPROM_WRITE_VAR(i, mbl.z_values);
+    EEPROM_WRITE_VAR(profile_num, i, mbl.active);
+    EEPROM_WRITE_VAR(profile_num, i, mesh_num_x);
+    EEPROM_WRITE_VAR(profile_num, i, mesh_num_y);
+    EEPROM_WRITE_VAR(profile_num, i, mbl.z_values);
   #else
     uint8_t dummy_uint8 = 0;
-    EEPROM_WRITE_VAR(i, dummy_uint8);
-    EEPROM_WRITE_VAR(i, mesh_num_x);
-    EEPROM_WRITE_VAR(i, mesh_num_y);
+    EEPROM_WRITE_VAR(profile_num, i, dummy_uint8);
+    EEPROM_WRITE_VAR(profile_num, i, mesh_num_x);
+    EEPROM_WRITE_VAR(profile_num, i, mesh_num_y);
     dummy = 0.0f;
-    for (int q=0; q<mesh_num_x*mesh_num_y; q++) EEPROM_WRITE_VAR(i, dummy);
+    for (int q=0; q<mesh_num_x*mesh_num_y; q++) EEPROM_WRITE_VAR(profile_num, i, dummy);
   #endif // MESH_BED_LEVELING
 
   #ifndef ENABLE_AUTO_BED_LEVELING
     float zprobe_zoffset = 0;
   #endif
-  EEPROM_WRITE_VAR(i, zprobe_zoffset);
+  EEPROM_WRITE_VAR(profile_num, i, zprobe_zoffset);
 
   #ifdef DELTA
-    EEPROM_WRITE_VAR(i, endstop_adj);               // 3 floats
-    EEPROM_WRITE_VAR(i, delta_radius);              // 1 float
-    EEPROM_WRITE_VAR(i, delta_diagonal_rod);        // 1 float
-    EEPROM_WRITE_VAR(i, delta_segments_per_second); // 1 float
+    EEPROM_WRITE_VAR(profile_num, i, endstop_adj);               // 3 floats
+    EEPROM_WRITE_VAR(profile_num, i, delta_radius);              // 1 float
+    EEPROM_WRITE_VAR(profile_num, i, delta_diagonal_rod);        // 1 float
+    EEPROM_WRITE_VAR(profile_num, i, delta_segments_per_second); // 1 float
   #elif defined(Z_DUAL_ENDSTOPS)
-    EEPROM_WRITE_VAR(i, z_endstop_adj);            // 1 floats
+    EEPROM_WRITE_VAR(profile_num, i, z_endstop_adj);            // 1 floats
     dummy = 0.0f;
-    for (int q=5; q--;) EEPROM_WRITE_VAR(i, dummy);
+    for (int q=5; q--;) EEPROM_WRITE_VAR(profile_num, i, dummy);
   #else
     dummy = 0.0f;
-    for (int q=6; q--;) EEPROM_WRITE_VAR(i, dummy);
+    for (int q=6; q--;) EEPROM_WRITE_VAR(profile_num, i, dummy);
   #endif
 
   #ifndef ULTIPANEL
@@ -214,34 +222,34 @@ void Config_StoreSettings()  {
         absPreheatHotendTemp = ABS_PREHEAT_HOTEND_TEMP, absPreheatHPBTemp = ABS_PREHEAT_HPB_TEMP, absPreheatFanSpeed = ABS_PREHEAT_FAN_SPEED;
   #endif // !ULTIPANEL
 
-  EEPROM_WRITE_VAR(i, plaPreheatHotendTemp);
-  EEPROM_WRITE_VAR(i, plaPreheatHPBTemp);
-  EEPROM_WRITE_VAR(i, plaPreheatFanSpeed);
-  EEPROM_WRITE_VAR(i, absPreheatHotendTemp);
-  EEPROM_WRITE_VAR(i, absPreheatHPBTemp);
-  EEPROM_WRITE_VAR(i, absPreheatFanSpeed);
+  EEPROM_WRITE_VAR(profile_num, i, plaPreheatHotendTemp);
+  EEPROM_WRITE_VAR(profile_num, i, plaPreheatHPBTemp);
+  EEPROM_WRITE_VAR(profile_num, i, plaPreheatFanSpeed);
+  EEPROM_WRITE_VAR(profile_num, i, absPreheatHotendTemp);
+  EEPROM_WRITE_VAR(profile_num, i, absPreheatHPBTemp);
+  EEPROM_WRITE_VAR(profile_num, i, absPreheatFanSpeed);
 
   for (int e = 0; e < 4; e++) {
 
     #ifdef PIDTEMP
       if (e < EXTRUDERS) {
-        EEPROM_WRITE_VAR(i, PID_PARAM(Kp, e));
-        EEPROM_WRITE_VAR(i, PID_PARAM(Ki, e));
-        EEPROM_WRITE_VAR(i, PID_PARAM(Kd, e));
+        EEPROM_WRITE_VAR(profile_num, i, PID_PARAM(Kp, e));
+        EEPROM_WRITE_VAR(profile_num, i, PID_PARAM(Ki, e));
+        EEPROM_WRITE_VAR(profile_num, i, PID_PARAM(Kd, e));
         #ifdef PID_ADD_EXTRUSION_RATE
-          EEPROM_WRITE_VAR(i, PID_PARAM(Kc, e));
+          EEPROM_WRITE_VAR(profile_num, i, PID_PARAM(Kc, e));
         #else
           dummy = 1.0f; // 1.0 = default kc
-          EEPROM_WRITE_VAR(i, dummy);
+          EEPROM_WRITE_VAR(profile_num, i, dummy);
         #endif
       }
       else
     #endif // !PIDTEMP
       {
         dummy = DUMMY_PID_VALUE; // When read, will not change the existing value
-        EEPROM_WRITE_VAR(i, dummy);
+        EEPROM_WRITE_VAR(profile_num, i, dummy);
         dummy = 0.0f;
-        for (int q = 3; q--;) EEPROM_WRITE_VAR(i, dummy);
+        for (int q = 3; q--;) EEPROM_WRITE_VAR(profile_num, i, dummy);
       }
 
   } // Extruders Loop
@@ -250,54 +258,54 @@ void Config_StoreSettings()  {
     float bedKp = DUMMY_PID_VALUE, bedKi = DUMMY_PID_VALUE, bedKd = DUMMY_PID_VALUE;
   #endif
 
-  EEPROM_WRITE_VAR(i, bedKp);
-  EEPROM_WRITE_VAR(i, bedKi);
-  EEPROM_WRITE_VAR(i, bedKd);
+  EEPROM_WRITE_VAR(profile_num, i, bedKp);
+  EEPROM_WRITE_VAR(profile_num, i, bedKi);
+  EEPROM_WRITE_VAR(profile_num, i, bedKd);
 
   #ifndef HAS_LCD_CONTRAST
     int lcd_contrast = 32;
   #endif
-  EEPROM_WRITE_VAR(i, lcd_contrast);
+  EEPROM_WRITE_VAR(profile_num, i, lcd_contrast);
 
   #ifdef SCARA
-    EEPROM_WRITE_VAR(i, axis_scaling); // 3 floats
+    EEPROM_WRITE_VAR(profile_num, i, axis_scaling); // 3 floats
   #else
     dummy = 1.0f;
-    EEPROM_WRITE_VAR(i, dummy);
+    EEPROM_WRITE_VAR(profile_num, i, dummy);
   #endif
 
   #ifdef FWRETRACT
-    EEPROM_WRITE_VAR(i, autoretract_enabled);
-    EEPROM_WRITE_VAR(i, retract_length);
+    EEPROM_WRITE_VAR(profile_num, i, autoretract_enabled);
+    EEPROM_WRITE_VAR(profile_num, i, retract_length);
     #if EXTRUDERS > 1
-      EEPROM_WRITE_VAR(i, retract_length_swap);
+      EEPROM_WRITE_VAR(profile_num, i, retract_length_swap);
     #else
       dummy = 0.0f;
-      EEPROM_WRITE_VAR(i, dummy);
+      EEPROM_WRITE_VAR(profile_num, i, dummy);
     #endif
-    EEPROM_WRITE_VAR(i, retract_feedrate);
-    EEPROM_WRITE_VAR(i, retract_zlift);
-    EEPROM_WRITE_VAR(i, retract_recover_length);
+    EEPROM_WRITE_VAR(profile_num, i, retract_feedrate);
+    EEPROM_WRITE_VAR(profile_num, i, retract_zlift);
+    EEPROM_WRITE_VAR(profile_num, i, retract_recover_length);
     #if EXTRUDERS > 1
-      EEPROM_WRITE_VAR(i, retract_recover_length_swap);
+      EEPROM_WRITE_VAR(profile_num, i, retract_recover_length_swap);
     #else
       dummy = 0.0f;
-      EEPROM_WRITE_VAR(i, dummy);
+      EEPROM_WRITE_VAR(profile_num, i, dummy);
     #endif
-    EEPROM_WRITE_VAR(i, retract_recover_feedrate);
+    EEPROM_WRITE_VAR(profile_num, i, retract_recover_feedrate);
   #endif // FWRETRACT
 
-  EEPROM_WRITE_VAR(i, volumetric_enabled);
+  EEPROM_WRITE_VAR(profile_num, i, volumetric_enabled);
 
   // Save filament sizes
   for (int q = 0; q < 4; q++) {
     if (q < EXTRUDERS) dummy = filament_size[q];
-    EEPROM_WRITE_VAR(i, dummy);
+    EEPROM_WRITE_VAR(profile_num, i, dummy);
   }
 
   char ver2[4] = EEPROM_VERSION;
   int j = EEPROM_OFFSET;
-  EEPROM_WRITE_VAR(j, ver2); // validate data
+  EEPROM_WRITE_VAR(profile_num, j, ver2); // validate data
 
 
   //Quick fix for archim. The default SPI CS pin conflicts with E0_STEP_PIN.
@@ -315,72 +323,72 @@ void Config_StoreSettings()  {
  * Retrieve Configuration Settings - M501
  */
 
-void Config_RetrieveSettings() {
+void Config_RetrieveSettings(int profile_num) {
   spiflash_init();
   int i = EEPROM_OFFSET;
   char stored_ver[4];
   char ver[4] = EEPROM_VERSION;
-  EEPROM_READ_VAR(i, stored_ver); //read stored version
+  EEPROM_READ_VAR(profile_num, i, stored_ver); //read stored version
   //  SERIAL_ECHOLN("Version: [" << ver << "] Stored version: [" << stored_ver << "]");
 
   if (strncmp(ver, stored_ver, 3) != 0) {
-    Config_ResetDefault();
+    Config_ResetDefault(profile_num);
   }
   else {
     float dummy = 0;
 
     // version number match
-    EEPROM_READ_VAR(i, axis_steps_per_unit);
-    EEPROM_READ_VAR(i, max_feedrate);
-    EEPROM_READ_VAR(i, max_acceleration_units_per_sq_second);
+    EEPROM_READ_VAR(profile_num, i, axis_steps_per_unit);
+    EEPROM_READ_VAR(profile_num, i, max_feedrate);
+    EEPROM_READ_VAR(profile_num, i, max_acceleration_units_per_sq_second);
 
     // steps per sq second need to be updated to agree with the units per sq second (as they are what is used in the planner)
     reset_acceleration_rates();
 
-    EEPROM_READ_VAR(i, acceleration);
-    EEPROM_READ_VAR(i, retract_acceleration);
-    EEPROM_READ_VAR(i, travel_acceleration);
-    EEPROM_READ_VAR(i, minimumfeedrate);
-    EEPROM_READ_VAR(i, mintravelfeedrate);
-    EEPROM_READ_VAR(i, minsegmenttime);
-    EEPROM_READ_VAR(i, max_xy_jerk);
-    EEPROM_READ_VAR(i, max_z_jerk);
-    EEPROM_READ_VAR(i, max_e_jerk);
-    EEPROM_READ_VAR(i, home_offset);
+    EEPROM_READ_VAR(profile_num, i, acceleration);
+    EEPROM_READ_VAR(profile_num, i, retract_acceleration);
+    EEPROM_READ_VAR(profile_num, i, travel_acceleration);
+    EEPROM_READ_VAR(profile_num, i, minimumfeedrate);
+    EEPROM_READ_VAR(profile_num, i, mintravelfeedrate);
+    EEPROM_READ_VAR(profile_num, i, minsegmenttime);
+    EEPROM_READ_VAR(profile_num, i, max_xy_jerk);
+    EEPROM_READ_VAR(profile_num, i, max_z_jerk);
+    EEPROM_READ_VAR(profile_num, i, max_e_jerk);
+    EEPROM_READ_VAR(profile_num, i, home_offset);
 
     uint8_t dummy_uint8 = 0, mesh_num_x = 0, mesh_num_y = 0;
-    EEPROM_READ_VAR(i, dummy_uint8);
-    EEPROM_READ_VAR(i, mesh_num_x);
-    EEPROM_READ_VAR(i, mesh_num_y);
+    EEPROM_READ_VAR(profile_num, i, dummy_uint8);
+    EEPROM_READ_VAR(profile_num, i, mesh_num_x);
+    EEPROM_READ_VAR(profile_num, i, mesh_num_y);
     #ifdef MESH_BED_LEVELING
       mbl.active = dummy_uint8;
       if (mesh_num_x == MESH_NUM_X_POINTS && mesh_num_y == MESH_NUM_Y_POINTS) {
-        EEPROM_READ_VAR(i, mbl.z_values);
+        EEPROM_READ_VAR(profile_num, i, mbl.z_values);
       } else {
         mbl.reset();
-        for (int q = 0; q < mesh_num_x * mesh_num_y; q++) EEPROM_READ_VAR(i, dummy);
+        for (int q = 0; q < mesh_num_x * mesh_num_y; q++) EEPROM_READ_VAR(profile_num, i, dummy);
       }
     #else
-      for (int q = 0; q < mesh_num_x * mesh_num_y; q++) EEPROM_READ_VAR(i, dummy);
+      for (int q = 0; q < mesh_num_x * mesh_num_y; q++) EEPROM_READ_VAR(profile_num, i, dummy);
     #endif // MESH_BED_LEVELING
 
     #ifndef ENABLE_AUTO_BED_LEVELING
       float zprobe_zoffset = 0;
     #endif
-    EEPROM_READ_VAR(i, zprobe_zoffset);
+    EEPROM_READ_VAR(profile_num, i, zprobe_zoffset);
 
     #ifdef DELTA
-      EEPROM_READ_VAR(i, endstop_adj);                // 3 floats
-      EEPROM_READ_VAR(i, delta_radius);               // 1 float
-      EEPROM_READ_VAR(i, delta_diagonal_rod);         // 1 float
-      EEPROM_READ_VAR(i, delta_segments_per_second);  // 1 float
+      EEPROM_READ_VAR(profile_num, i, endstop_adj);                // 3 floats
+      EEPROM_READ_VAR(profile_num, i, delta_radius);               // 1 float
+      EEPROM_READ_VAR(profile_num, i, delta_diagonal_rod);         // 1 float
+      EEPROM_READ_VAR(profile_num, i, delta_segments_per_second);  // 1 float
     #elif defined(Z_DUAL_ENDSTOPS)
-      EEPROM_READ_VAR(i, z_endstop_adj);
+      EEPROM_READ_VAR(profile_num, i, z_endstop_adj);
       dummy = 0.0f;
-      for (int q=5; q--;) EEPROM_READ_VAR(i, dummy);
+      for (int q=5; q--;) EEPROM_READ_VAR(profile_num, i, dummy);
     #else
       dummy = 0.0f;
-      for (int q=6; q--;) EEPROM_READ_VAR(i, dummy);
+      for (int q=6; q--;) EEPROM_READ_VAR(profile_num, i, dummy);
     #endif
 
     #ifndef ULTIPANEL
@@ -388,84 +396,84 @@ void Config_RetrieveSettings() {
           absPreheatHotendTemp, absPreheatHPBTemp, absPreheatFanSpeed;
     #endif
 
-    EEPROM_READ_VAR(i, plaPreheatHotendTemp);
-    EEPROM_READ_VAR(i, plaPreheatHPBTemp);
-    EEPROM_READ_VAR(i, plaPreheatFanSpeed);
-    EEPROM_READ_VAR(i, absPreheatHotendTemp);
-    EEPROM_READ_VAR(i, absPreheatHPBTemp);
-    EEPROM_READ_VAR(i, absPreheatFanSpeed);
+    EEPROM_READ_VAR(profile_num, i, plaPreheatHotendTemp);
+    EEPROM_READ_VAR(profile_num, i, plaPreheatHPBTemp);
+    EEPROM_READ_VAR(profile_num, i, plaPreheatFanSpeed);
+    EEPROM_READ_VAR(profile_num, i, absPreheatHotendTemp);
+    EEPROM_READ_VAR(profile_num, i, absPreheatHPBTemp);
+    EEPROM_READ_VAR(profile_num, i, absPreheatFanSpeed);
 
     #ifdef PIDTEMP
       for (int e = 0; e < 4; e++) { // 4 = max extruders currently supported by Marlin
-        EEPROM_READ_VAR(i, dummy); // Kp
+        EEPROM_READ_VAR(profile_num, i, dummy); // Kp
         if (e < EXTRUDERS && dummy != DUMMY_PID_VALUE) {
           // do not need to scale PID values as the values in EEPROM are already scaled
           PID_PARAM(Kp, e) = dummy;
-          EEPROM_READ_VAR(i, PID_PARAM(Ki, e));
-          EEPROM_READ_VAR(i, PID_PARAM(Kd, e));
+          EEPROM_READ_VAR(profile_num, i, PID_PARAM(Ki, e));
+          EEPROM_READ_VAR(profile_num, i, PID_PARAM(Kd, e));
           #ifdef PID_ADD_EXTRUSION_RATE
-            EEPROM_READ_VAR(i, PID_PARAM(Kc, e));
+            EEPROM_READ_VAR(profile_num, i, PID_PARAM(Kc, e));
           #else
-            EEPROM_READ_VAR(i, dummy);
+            EEPROM_READ_VAR(profile_num, i, dummy);
           #endif
         }
         else {
-          for (int q=3; q--;) EEPROM_READ_VAR(i, dummy); // Ki, Kd, Kc
+          for (int q=3; q--;) EEPROM_READ_VAR(profile_num, i, dummy); // Ki, Kd, Kc
         }
       }
     #else // !PIDTEMP
       // 4 x 4 = 16 slots for PID parameters
-      for (int q=16; q--;) EEPROM_READ_VAR(i, dummy);  // 4x Kp, Ki, Kd, Kc
+      for (int q=16; q--;) EEPROM_READ_VAR(profile_num, i, dummy);  // 4x Kp, Ki, Kd, Kc
     #endif // !PIDTEMP
 
     #ifndef PIDTEMPBED
       float bedKp, bedKi, bedKd;
     #endif
 
-    EEPROM_READ_VAR(i, dummy); // bedKp
+    EEPROM_READ_VAR(profile_num, i, dummy); // bedKp
     if (dummy != DUMMY_PID_VALUE) {
       bedKp = dummy;
-      EEPROM_READ_VAR(i, bedKi);
-      EEPROM_READ_VAR(i, bedKd);
+      EEPROM_READ_VAR(profile_num, i, bedKi);
+      EEPROM_READ_VAR(profile_num, i, bedKd);
     }
     else {
-      for (int q=2; q--;) EEPROM_READ_VAR(i, dummy); // bedKi, bedKd
+      for (int q=2; q--;) EEPROM_READ_VAR(profile_num, i, dummy); // bedKi, bedKd
     }
 
     #ifndef HAS_LCD_CONTRAST
       int lcd_contrast;
     #endif
-    EEPROM_READ_VAR(i, lcd_contrast);
+    EEPROM_READ_VAR(profile_num, i, lcd_contrast);
 
     #ifdef SCARA
-      EEPROM_READ_VAR(i, axis_scaling);  // 3 floats
+      EEPROM_READ_VAR(profile_num, i, axis_scaling);  // 3 floats
     #else
-      EEPROM_READ_VAR(i, dummy);
+      EEPROM_READ_VAR(profile_num, i, dummy);
     #endif
 
     #ifdef FWRETRACT
-      EEPROM_READ_VAR(i, autoretract_enabled);
-      EEPROM_READ_VAR(i, retract_length);
+      EEPROM_READ_VAR(profile_num, i, autoretract_enabled);
+      EEPROM_READ_VAR(profile_num, i, retract_length);
       #if EXTRUDERS > 1
-        EEPROM_READ_VAR(i, retract_length_swap);
+        EEPROM_READ_VAR(profile_num, i, retract_length_swap);
       #else
-        EEPROM_READ_VAR(i, dummy);
+        EEPROM_READ_VAR(profile_num, i, dummy);
       #endif
-      EEPROM_READ_VAR(i, retract_feedrate);
-      EEPROM_READ_VAR(i, retract_zlift);
-      EEPROM_READ_VAR(i, retract_recover_length);
+      EEPROM_READ_VAR(profile_num, i, retract_feedrate);
+      EEPROM_READ_VAR(profile_num, i, retract_zlift);
+      EEPROM_READ_VAR(profile_num, i, retract_recover_length);
       #if EXTRUDERS > 1
-        EEPROM_READ_VAR(i, retract_recover_length_swap);
+        EEPROM_READ_VAR(profile_num, i, retract_recover_length_swap);
       #else
-        EEPROM_READ_VAR(i, dummy);
+        EEPROM_READ_VAR(profile_num, i, dummy);
       #endif
-      EEPROM_READ_VAR(i, retract_recover_feedrate);
+      EEPROM_READ_VAR(profile_num, i, retract_recover_feedrate);
     #endif // FWRETRACT
 
-    EEPROM_READ_VAR(i, volumetric_enabled);
+    EEPROM_READ_VAR(profile_num, i, volumetric_enabled);
 
     for (int q = 0; q < 4; q++) {
-      EEPROM_READ_VAR(i, dummy);
+      EEPROM_READ_VAR(profile_num, i, dummy);
       if (q < EXTRUDERS) filament_size[q] = dummy;
     }
 
@@ -745,7 +753,7 @@ void Config_PrintSettings(bool forReplay) {
       CONFIG_ECHO_START;
     }
     SERIAL_ECHOPAIR("  M666 Z", z_endstop_adj);
-    SERIAL_EOL;  
+    SERIAL_EOL;
   #endif // DELTA
 
   #ifdef ULTIPANEL
@@ -783,7 +791,7 @@ void Config_PrintSettings(bool forReplay) {
             //SERIAL_ECHOPAIR(" Max_PID ", (unsigned long)PID_PARAM(Km, i));
             #ifdef PID_ADD_EXTRUSION_RATE
               SERIAL_ECHOPAIR(" C", PID_PARAM(Kc, i));
-            #endif      
+            #endif
             SERIAL_EOL;
           }
         }
@@ -797,7 +805,7 @@ void Config_PrintSettings(bool forReplay) {
         SERIAL_ECHOPAIR(" D", unscalePID_d(PID_PARAM(Kd, 0)));
         #ifdef PID_ADD_EXTRUSION_RATE
           SERIAL_ECHOPAIR(" C", PID_PARAM(Kc, 0));
-        #endif      
+        #endif
         SERIAL_EOL;
       }
     #endif // PIDTEMP
